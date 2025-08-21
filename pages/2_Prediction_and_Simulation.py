@@ -17,7 +17,59 @@ try:
          nutrient_gap_encoded['nutrient_gap_level_encoded'] = nutrient_gap_encoded['nutrient_gap_level_encoded'].astype(int)
     model = joblib.load('nutrient_gap_model.pkl')
 
+
     st.title("Nutrient Gap Prediction & Intervention Simulation")
+
+    st.header("User Input Guide")
+    st.write("Input the corresponding numerical codes for your inputs")
+    
+    st.write("### Regional Codes Guide")
+    st.write("Please use the following numerical codes for your input:")
+    
+    # Display the information using markdown formatting
+    
+    st.write("""
+    | Code | Region Name  |
+    |:----:|:-------------|
+    | 0    | Ashanti      |
+    | 1    |Brong Ahafo   |
+    | 2    | Central      |
+    | 3    | Eastern      |
+    | 4    |Greater Accra |
+    | 5    | Northern     |
+    | 6    | Upper East   |
+    | 7    | Upper West   |
+    | 8    | Volta        | 
+    | 9    | Western      |
+    """)
+
+# The rest of your app's code for inputs, prediction, and simulation goes here...
+# For example:
+# st.number_input("Enter the numerical code for the region:", min_value=1, max_value=6)
+    
+    st.write("### PCFCI Codes Guide")
+    st.write("Please use the following numerical codes for the **PCFCi** field:")
+    st.write("""
+    | Value | Vulnerability Level |
+    |:-----:|:--------------------|
+    | 0.0   | Vulnerable          |
+    | 1.0   | Not Vulnerable      |
+    """)
+    
+    #VCCI
+    st.write("### VCCI Codes Guide")
+    st.write("Please use the following numerical codes for the **VCCi** field:")
+    st.write("""
+    | Value | Vulnerability Level |
+    |:-----:|:--------------------|
+    | 0.0   | Not Vulnerable      |
+    | 1.0   | Vulnerable          |
+    """)
+
+# The rest of your app's code for inputs, prediction, and simulation goes here...
+# For example:
+# pcfci_input = st.number_input("Enter PCFCi value:", min_value=0.0, max_value=1.0)
+# vcci_input = st.number_input("Enter VCCi value:", min_value=0.0, max_value=1.0)
 
     # Recreate the preprocessing pipeline and fit it
     num_pipeline = Pipeline([
@@ -35,27 +87,30 @@ try:
 
     feature_labels = {
         'category': 'Region (Category)',
-        'pcfci': 'Per Capita Food Consumption Index',
-        'avg_kcalories': 'Average Kilocalories',
-        'avg_ca(mg)': 'Average Calcium (mg)',
-        'avg_folate(mcg)': 'Average Folate (mcg)',
-        'avg_iron(mg)': 'Average Iron (mg)',
-        'avg_niacin(mg)': 'Average Niacin (mg)',
-        'avg_riboflavin(mg)': 'Average Riboflavin (mg)',
-        'avg_thiamin(mg)': 'Average Thiamin (mg)',
-        'avg_vita(mcg)': 'Average Vitamin A (mcg)',
-        'avg_vitb12(mcg)': 'Average Vitamin B12 (mcg)',
-        'avg_vitb6(mg)': 'Average Vitamin B6 (mg)',
-        'avg_zinc(mg)': 'Average Zinc (mg)',
-        'vcci': 'Vulnerability to Climate Change Index',
-        'maize(mt)': 'Maize Production (mt)',
-        'rice(mt)': 'Rice Production (mt)',
-        'sorghum(mt)': 'Sorghum Production (mt)',
-        'cassava(mt)': 'Cassava Production (mt)',
-        'millet(mt)': 'Millet Production (mt)',
+        'pcfci': 'Per Capita Food Consumption Index(PCFCI)',
+        'avg_kcalories': 'Average Kilocalories(%)',
+        'avg_ca(mg)': 'Average Calcium (mg)(%)',
+        'avg_folate(mcg)': 'Average Folate (mcg)(%)',
+        'avg_iron(mg)': 'Average Iron (mg)(%)',
+        'avg_niacin(mg)': 'Average Niacin (mg)(%)',
+        'avg_riboflavin(mg)': 'Average Riboflavin (mg)(%)',
+        'avg_thiamin(mg)': 'Average Thiamin (mg)(%)',
+        'avg_vita(mcg)': 'Average Vitamin A (mcg)(%)',
+        'avg_vitb12(mcg)': 'Average Vitamin B12 (mcg)(%)',
+        'avg_vitb6(mg)': 'Average Vitamin B6 (mg)(%)',
+        'avg_zinc(mg)': 'Average Zinc (mg)(%)',
+        'vcci': 'Vulnerability to Climate Change Index(VCCI)',
+        'maize(mt)': 'Maize Production (amt)',
+        'rice(mt)': 'Rice Production (amt)',
+        'sorghum(mt)': 'Sorghum Production (amt)',
+        'cassava(mt)': 'Cassava Production (amt)',
+        'millet(mt)': 'Millet Production (amt)',
         'price': 'Commodity Price',
     }
     
+    st. write(
+        
+    )
     # Add one-hot encoded labels
     for col in X_for_pipeline_fit.columns:
         if col.startswith('commodity_'):
@@ -123,19 +178,32 @@ try:
 
     intervention_scenarios = {
         "No Intervention": {},
-        "Increase Protein Consumption": {
-            'avg_iron(mg)': 1.1,
-            'avg_zinc(mg)': 1.1,
-            'avg_vitb12(mcg)': 1.1
+        "Increase in Nutritious Food": {
+            'avg_ca(mg)': 1.1,
+            'avg_thiamin(mg)': 1.1,
+            'avg_vitb12(mcg)': 1.1,
+            'pcfci':0.9,
+            'avg_vita(mcg)':1.1,
+            'avg_riboflavin(mg)':1.1,
+            'avg_niacin(mg)':1.1,
+            'millet(mt)':1.2,
+            'sorghum(mt)':1.2
+
         },
         "Promote Fortified Foods": {
-            'avg_vita(mcg)': 1.2,
-            'avg_folate(mcg)': 1.2
+            'avg_ca(mg)': 1.1,
+            'avg_thiamin(mg)': 1.1,
+            'avg_vitb12(mcg)': 1.1,
+            'pcfci':0.9,
+            'avg_vita(mcg)':1.1,
+            'avg_riboflavin(mg)':1.1,
+            'avg_niacin(mg)':1.1
+            
         },
         "Improve Climate Resilience": {
-            'vcci': 0.9,
-            'maize(mt)': 1.1,
-            'rice(mt)': 1.1
+            'pcfci': 0.9,
+            'sorghum(mt)': 1.3,
+            'millet(mt)': 1.3
         }
     }
 
@@ -182,16 +250,7 @@ try:
             st.warning("Please get the initial prediction first before simulating interventions.")
 
 
-    st.header("Recommendations")
-    st.write("""
-    Based on the analysis, the following recommendations can be considered to address nutrient gaps in Ghana:
 
-    - **Investigate the impact of climate change:** Conduct further research into how climate change specifically affects agricultural production in vulnerable regions like Northern Ghana. Implement climate-resilient agricultural practices.
-    - **Regulate commodity prices:** Implement policies to regulate the prices of highly nutritious commodities to make them more affordable and accessible to vulnerable populations.
-    - **Promote diversified agriculture:** Encourage the production of a wider variety of nutritious foods beyond staple crops, including protein-rich sources like poultry and fish, and nutrient-dense crops like sorghum and millet.
-    - **Promote nutritional education:** Implement educational programs in schools and communities to raise awareness about the importance of balanced diets and proper nutrition for healthy living and productivity.
-    - **Support food fortification:** Encourage and support initiatives for food fortification, such as adding Vitamin A to cassava, to improve the nutritional content of commonly consumed foods.
-    """)
 
 except FileNotFoundError:
     st.error("Error: Required data files ('nutrient_gap.csv', 'nutrient_gap_encoded.csv', or 'nutrient_gap_model.pkl') were not found. Please ensure they are in the same directory as the app.")
