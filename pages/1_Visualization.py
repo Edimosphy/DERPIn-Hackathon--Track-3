@@ -4,24 +4,48 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Load the original data for visualizations
+# Set page configuration for a wider layout
+st.set_page_config(layout="wide")
+
+# --- Global Variables and Data Loading ---
 try:
+    # Load the original data for visualizations
     nutrient_gap_original = pd.read_csv('nutrient_gap.csv')
-except FileNotFoundError:
-     st.error("Error: 'nutrient_gap.csv' not found. Please make sure the original data file is in the same directory as the app.")
-     st.stop()
     
-# Load the encoded data for the correlation matrix
-try:
+    # Load the encoded data for the correlation matrix
     nutrient_gap_encoded = pd.read_csv('nutrient_gap_encoded.csv')
-except FileNotFoundError:
-    st.error("Error: 'nutrient_gap_encoded.csv' not found. Please make sure the encoded data file is in the same directory as the app.")
+
+except FileNotFoundError as e:
+    st.error(f"Error: Required data files not found. {e}. Please ensure the files are in the same directory as the app.")
+    st.stop()
+except Exception as e:
+    st.error(f"An unexpected error occurred during setup: {e}")
     st.stop()
 
 
+# --- Data Preprocessing for Top/Less 5 Commodities ---
+
+# Calculate the mean MNARI for each commodity
+commodity_mnari_mean = nutrient_gap_original.groupby('commodity')['mnari'].mean().reset_index()
+
+# Sort to get the top 5 (lowest MNARI, most significant gap) and less 5 (highest MNARI, least significant gap)
+# A lower MNARI means a more severe gap, so we sort in ascending order.
+top_5_commodities = commodity_mnari_mean.sort_values(by='mnari', ascending=True).head(5)
+less_5_commodities = commodity_mnari_mean.sort_values(by='mnari', ascending=False).head(5)
+
+# Filter the original dataframes to create the specific data for the plots
+top_5_nutrient_gap = nutrient_gap_original[
+    nutrient_gap_original['commodity'].isin(top_5_commodities['commodity'])
+].copy()
+
+less_5_nutrient_gap = nutrient_gap_original[
+    nutrient_gap_original['commodity'].isin(less_5_commodities['commodity'])
+].copy()
+
+
+# --- Streamlit UI and Plots ---
 
 st.title("Data Visualizations")
-
 
 st.header("Mean Nutrient Adequacy Ratio Index by Region")
 # Mean Nutrient Adequacy Ratio Index by Region
@@ -39,8 +63,8 @@ plt.clf()
 st.write("This bar chart shows the average Mean Nutrient Adequacy Ratio Index (MNARI) for each region in Ghana. Lower MNARI values indicate a higher nutrient gap.")
 
 
-# Mean Nutrient Adequacy Ratio Index by Commodity
 st.header("Mean Nutrient Adequacy Ratio Index by Commodity")
+# Mean Nutrient Adequacy Ratio Index by Commodity
 plt.figure(figsize=(15, 8))
 ax = sns.barplot(data=nutrient_gap_original, x="commodity", y="mnari", errorbar=None)
 plt.title("Mean Nutrient Adequacy Ratio Index by Commodity")
@@ -55,12 +79,11 @@ plt.clf()
 st.write("This bar chart displays the average MNARI for different commodities. Commodities with lower MNARI might be less accessible or consumed in areas with high nutrient gaps.")
 
 
-
-st.header("Top 5 Commodity vs. Price vs. Region")
+st.header("Top 5 Commodities with the Most Significant Nutrient Gap")
 # Top 5 Commodity Vs Price Vs Region
-plt.figure(figsize= (15,20))
-ax = sns.barplot(data=top_5_nutrient_gap, x="region", y= "price", hue="commodity", errorbar=None)
-plt.title("Price of High Consume Commodity by Region", fontsize= 14, fontweight= "bold")
+plt.figure(figsize= (15, 10))
+ax = sns.barplot(data=top_5_nutrient_gap, x="region", y="price", hue="commodity", errorbar=None)
+plt.title("Price of Top 5 Commodities by Region", fontsize= 14, fontweight= "bold")
 plt.xlabel("Region", fontsize= 12, fontweight= "bold")
 plt.ylabel("Price", fontsize= 12, fontweight= "bold")
 plt.xticks(rotation=90)
@@ -72,14 +95,14 @@ for container in ax.containers:
 st.pyplot(plt)
 plt.clf()
 
-st.write("This bar chart illustrates the prices of the top 5 most consumed commodities across different regions. This helps to visualize regional price variations for key staples.")
+st.write("This bar chart illustrates the prices of the top 5 most significant nutrient-gap commodities across different regions. This helps to visualize regional price variations for key staples.")
 
 
-st.header("Less 5 Commodity vs. Price vs. Region")
+st.header("5 Commodities with the Least Significant Nutrient Gap")
 # Less 5 Commodity Vs Price Vs Region
-plt.figure(figsize= (15,20))
+plt.figure(figsize= (15, 10))
 ax = sns.barplot(data=less_5_nutrient_gap, x="region", y="price", hue="commodity", errorbar=None)
-plt.title("Price of 5 Less Consume Commodity by Region", fontsize= 14, fontweight= "bold")
+plt.title("Price of 5 Least Significant Nutrient-Gap Commodities by Region", fontsize= 14, fontweight= "bold")
 plt.xlabel("Region", fontsize= 12, fontweight= "bold")
 plt.ylabel("Price", fontsize= 12, fontweight= "bold")
 plt.xticks(rotation=90)
@@ -91,9 +114,7 @@ for container in ax.containers:
 st.pyplot(plt)
 plt.clf()
 
-st.write("This chart shows the prices of the 5 least consumed commodities by region, which can provide insights into the cost of less common food sources.")
-
-# --- END OF NEW PLOTS ---
+st.write("This chart shows the prices of the 5 least significant nutrient-gap commodities by region, which can provide insights into the cost of more common food sources.")
 
 
 # Correlation Matrix
@@ -107,7 +128,6 @@ st.pyplot(plt)
 plt.clf()
 
 st.write("The correlation matrix shows the relationships between the numerical features and the one-hot encoded commodity features in the dataset.")
-
 
 st.header("Key Insight")
 st.write("""
