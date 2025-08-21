@@ -9,7 +9,7 @@ The main objectives of this project are:
 
 ## Data Sources
 The analysis leverages data from multiple sources for the year 2022, including:
-- Ghana Food Security and Nutrition Indicators (FAOSTAT, HDX)
+- Ghana Food Security and Nutrition Indicators (FAOSTAT, HDX)- Other reliable source
 - AGWAA API Documentation - Ghana (2022)
 - Food System Crisis Observatory and Response (FS-COR) Platform
   
@@ -40,7 +40,11 @@ Based on the analysis of the Ghana nutrition data:
 - Further Research on Price Drivers: Investigate the underlying causes of price spikes in nutritious commodities, including the impact of climate change, market dynamics, and supply chain issues.
 - Monitor and Evaluate: Continuously monitor nutrient gap levels and evaluate the impact of implemented interventions to adapt strategies as needed.
 
-##Usage 
+## Usage 
 Usage of the application is broken down into two main interfaces, accessible via the sidebar on the home page using streamlit web app
 - Data Visualizations: This section presents interactive charts and graphs that allow you to explore key findings, such as regional disparities in nutrient adequacy and the impact of different commodities on nutritional status.
 - Prediction & Simulation: This interface allows you to input specific data points to get a prediction on the nutrient gap level. It also includes a simulation feature where you can model the effects of different interventions and see how they would change the predicted outcome.
+
+## Challenges
+- The dataset from AGWAA API Documentation and Food System Crisis Observatory and Response (FS-COR) Platform were hard to collect as the Api of the file was not accessible.
+- This was solved by manually collected dataset from AGWAA API publication and sorting of the FS-COR csv.
