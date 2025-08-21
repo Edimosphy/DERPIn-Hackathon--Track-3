@@ -171,17 +171,19 @@ st.write("Select an intervention scenario to see its potential impact on the nut
 intervention_scenarios = {
     "No Intervention": {},
     "Increase in Nutritious Food": {
-        'avg_ca(mg)': 1.1, 'avg_thiamin(mg)': 1.1, 'avg_vitb12(mcg)': 1.1,
-        'pcfci': 0.9, 'avg_vita(mcg)': 1.1, 'avg_riboflavin(mg)': 1.1,
-        'avg_niacin(mg)': 1.1, 'millet(mt)': 1.2, 'sorghum(mt)': 1.2
+        'avg_ca(mg)': 1.5, 'avg_thiamin(mg)': 1.5, 'avg_vitb12(mcg)': 1.5,
+        'pcfci': 0.5, 'avg_vita(mcg)': 1.5, 'avg_riboflavin(mg)': 1.5,
+        'avg_niacin(mg)': 1.5, 'millet(mt)': 1.2, 'sorghum(mt)': 1.2
     },
     "Promote Fortified Foods": {
-        'avg_ca(mg)': 1.1, 'avg_thiamin(mg)': 1.1, 'avg_vitb12(mcg)': 1.1,
-        'pcfci': 0.9, 'avg_vita(mcg)': 1.1, 'avg_riboflavin(mg)': 1.1,
-        'avg_niacin(mg)': 1.1
+        'avg_ca(mg)': 1.5, 'avg_thiamin(mg)': 1.5, 'avg_vitb12(mcg)': 1.5,
+        'pcfci': 0.5, 'avg_vita(mcg)': 1.5, 'avg_riboflavin(mg)': 1.5,
+        'avg_niacin(mg)': 1.5
     },
     "Improve Climate Resilience": {
-        'pcfci': 0.9, 'sorghum(mt)': 1.3, 'millet(mt)': 1.3
+        'pcfci': 0.5, 'sorghum(mt)': 1.5, 'millet(mt)': 1.5, 'avg_thiamin(mg)': 1.5, 'avg_vitb12(mcg)': 1.5,
+        'pcfci': 0.5, 'avg_vita(mcg)': 1.5, 'avg_riboflavin(mg)': 1.5,
+        'avg_niacin(mg)': 1.5
     }
 }
 
