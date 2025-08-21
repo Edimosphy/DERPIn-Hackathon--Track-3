@@ -102,8 +102,23 @@ for feature in input_cols_for_ui:
         min_val = float(X_for_pipeline_fit[feature].min())
         max_val = float(X_for_pipeline_fit[feature].max())
         mean_val = float(X_for_pipeline_fit[feature].mean())
-        step_val = 1.0 if X_for_pipeline_fit[feature].nunique() <= 2 else None
-        initial_input_data[feature] = st.number_input(f"Enter a value for {display_label}", min_value=min_val, max_value=max_val, value=mean_val, step=step_val)
+        
+        # Check if the feature is binary (e.g., PCFCI or VCCI)
+        if X_for_pipeline_fit[feature].nunique() <= 2:
+            initial_input_data[feature] = st.number_input(
+                f"Enter a value for {display_label}", 
+                min_value=min_val, 
+                max_value=max_val, 
+                value=mean_val, 
+                step=1.0
+            )
+        else:
+            initial_input_data[feature] = st.slider(
+                f"Select a value for {display_label}", 
+                min_value=min_val, 
+                max_value=max_val, 
+                value=mean_val
+            )
     else:
         initial_input_data[feature] = 0.0
 
