@@ -183,9 +183,10 @@ if st.button("Get Initial Prediction"):
         st.dataframe(input_df_full[selected_features_names])
 
         initial_predicted_level_label = get_prediction_result(input_df_full, num_pipeline, model, nutrient_gap_labels)
+        selected_region_name = category_region_map.get(initial_input_data['category'], 'Unknown Region')
         
         if initial_predicted_level_label:
-            st.subheader(f"Initial Predicted Nutrient Gap Level: {initial_predicted_level_label}")
+            st.subheader(f"Initial Predicted Nutrient Gap Level in {selected_region_name}: {initial_predicted_level_label}")
 
             initial_prediction_data = {'Nutrient Gap Level': [initial_predicted_level_label], 'Value': [1]}
             initial_prediction_df = pd.DataFrame(initial_prediction_data)
@@ -266,8 +267,12 @@ if st.button("Simulate Intervention"):
 
             predicted_level_label = get_prediction_result(simulated_df_full, num_pipeline, model, nutrient_gap_labels)
             
+            # Get the region name from the initial state
+            initial_category = st.session_state['initial_input_df_full']['category'].iloc[0]
+            selected_region_name = category_region_map.get(initial_category, 'Unknown Region')
+
             if predicted_level_label:
-                st.subheader(f"Predicted Nutrient Gap Level after {selected_scenario}: {predicted_level_label}")
+                st.subheader(f"Predicted Nutrient Gap Level in {selected_region_name} after {selected_scenario}: {predicted_level_label}")
 
                 simulated_prediction_data = {'Nutrient Gap Level': [predicted_level_label], 'Value': [1]}
                 simulated_prediction_df = pd.DataFrame(simulated_prediction_data)
