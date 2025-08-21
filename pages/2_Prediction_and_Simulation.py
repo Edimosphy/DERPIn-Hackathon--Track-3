@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest, f_classif, VarianceThreshold
 from sklearn.pipeline import Pipeline
 
@@ -24,10 +24,7 @@ try:
     # Load the trained model
     model = joblib.load('nutrient_gap_model.pkl')
 
-    # Create the label encoder and mapping globally
-    label_encoder = LabelEncoder()
-    # Fit on the original data to get the correct mapping
-    label_encoder.fit(nutrient_gap_original['nutrient_gap_level'])
+    # The label mapping is hardcoded since the original file may not contain the label column
     nutrient_gap_labels = {
         0: 'Small Nutrient Gap',
         1: 'Significant Nutrient Gap',
@@ -76,33 +73,6 @@ def get_prediction_result(input_df_full, pipeline, model, labels):
         st.error(f"Error during prediction: {e}")
         return None
 
-def get_top_5_gaps(input_data, labels_map):
-    """
-    Identifies the top 5 most significant nutrient gaps from the input data.
-    A lower value indicates a more significant gap.
-    """
-    nutrient_features = [
-        'avg_kcalories', 'avg_ca(mg)', 'avg_folate(mcg)', 'avg_iron(mg)',
-        'avg_niacin(mg)', 'avg_riboflavin(mg)', 'avg_thiamin(mg)',
-        'avg_vita(mcg)', 'avg_vitb12(mcg)', 'avg_vitb6(mg)', 'avg_zinc(mg)'
-    ]
-    
-    # Filter the input data to only include nutrient features
-    nutrient_values = {
-        key: input_data[key] for key in input_data.columns if key in nutrient_features
-    }
-    
-    # Sort the nutrients by their value (lowest first)
-    sorted_nutrients = sorted(nutrient_values.items(), key=lambda item: item[1])
-    
-    # Get the top 5 gaps
-    top_5_gaps = []
-    for feature, value in sorted_nutrients[:5]:
-        display_name = labels_map.get(feature, feature)
-        top_5_gaps.append({'Nutrient': display_name, 'Value': value})
-        
-    return top_5_gaps
-
 # --- Streamlit UI ---
 
 st.title("Nutrient Gap Prediction & Intervention Simulation")
@@ -148,7 +118,6 @@ st.write("""
 | 1.0   | Vulnerable      |
 """)
 
-# Recreate the preprocessing pipeline and fit it
 category_region_map = nutrient_gap_original[['category', 'region']].drop_duplicates().set_index('category')['region'].to_dict()
 
 feature_labels = {
