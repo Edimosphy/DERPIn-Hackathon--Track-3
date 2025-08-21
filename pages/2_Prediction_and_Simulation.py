@@ -166,42 +166,58 @@ if 'initial_prediction_run' in st.session_state and st.session_state['initial_pr
 
 # --- Intervention Simulation ---
 st.header("Intervention Simulation")
-st.write("Select an intervention scenario to see its potential impact on the nutrient gap level.")
+st.write("Select an intervention scenario and its intensity to see its potential impact on the nutrient gap level.")
 
+# Updated intervention scenarios with features to be affected (not hardcoded multipliers)
 intervention_scenarios = {
-    "No Intervention": {},
-    "Increase in Nutritious Food": {
-        'avg_ca(mg)': 1.5, 'avg_thiamin(mg)': 1.5, 'avg_vitb12(mcg)': 1.5,
-        'pcfci': 0.5, 'avg_vita(mcg)': 1.5, 'avg_riboflavin(mg)': 1.5,
-        'avg_niacin(mg)': 1.5, 'millet(mt)': 1.2, 'sorghum(mt)': 1.2
-    },
-    "Promote Fortified Foods": {
-        'avg_ca(mg)': 1.5, 'avg_thiamin(mg)': 1.5, 'avg_vitb12(mcg)': 1.5,
-        'pcfci': 0.5, 'avg_vita(mcg)': 1.5, 'avg_riboflavin(mg)': 1.5,
-        'avg_niacin(mg)': 1.5
-    },
-    "Improve Climate Resilience": {
-        'pcfci': 0.5, 'sorghum(mt)': 1.5, 'millet(mt)': 1.5, 'avg_thiamin(mg)': 1.5, 'avg_vitb12(mcg)': 1.5,
-        'pcfci': 0.5, 'avg_vita(mcg)': 1.5, 'avg_riboflavin(mg)': 1.5,
-        'avg_niacin(mg)': 1.5
-    }
+    "No Intervention": [],
+    "Increase in Nutritious Food": [
+        'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)', 
+        'avg_riboflavin(mg)', 'avg_niacin(mg)', 'millet(mt)', 'sorghum(mt)'
+    ],
+    "Promote Fortified Foods": [
+        'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)', 
+        'avg_riboflavin(mg)', 'avg_niacin(mg)'
+    ],
+    "Improve Climate Resilience": [
+        'pcfci', 'sorghum(mt)', 'millet(mt)'
+    ]
 }
 
 selected_scenario = st.selectbox("Select an intervention scenario:", list(intervention_scenarios.keys()))
+# Add a slider for the user to select the percentage
+intervention_percentage = st.slider(
+    "Select the percentage of intervention impact (10% to 100%)",
+    min_value=10,
+    max_value=100,
+    value=50,
+    step=10
+)
 
 if st.button("Simulate Intervention"):
     if 'initial_input_df_full' in st.session_state:
         try:
             simulated_df_full = st.session_state['initial_input_df_full'].copy()
-            scenario_impact = intervention_scenarios[selected_scenario]
-
-            for feature, multiplier in scenario_impact.items():
+            scenario_features = intervention_scenarios[selected_scenario]
+            
+            # Calculate the dynamic multiplier based on the slider value
+            percentage_decimal = intervention_percentage / 100.0
+            
+            # Apply the multiplier to the relevant features
+            for feature in scenario_features:
                 if feature in simulated_df_full.columns:
-                    simulated_df_full[feature] *= multiplier
+                    # 'pcfci' is a price index, so a positive intervention means a decrease in value
+                    if feature == 'pcfci':
+                        multiplier = 1 - percentage_decimal
+                        simulated_df_full[feature] *= multiplier
+                    # All other features are nutrients or crop yields, so a positive intervention means an increase
+                    else:
+                        multiplier = 1 + percentage_decimal
+                        simulated_df_full[feature] *= multiplier
                 else:
                     st.write(f"Warning: Scenario impacts feature '{feature}' not found in the simulation dataframe.")
             
-            st.subheader(f"Simulated Data after {selected_scenario} Intervention")
+            st.subheader(f"Simulated Data after {selected_scenario} Intervention at {intervention_percentage}% Impact")
             st.dataframe(simulated_df_full[selected_features_names])
 
             predicted_level_label = get_prediction_result(simulated_df_full, num_pipeline, model, nutrient_gap_labels)
@@ -224,11 +240,11 @@ if st.button("Simulate Intervention"):
                 plt.clf()
 
                 if predicted_level_label == 'Small Nutrient Gap':
-                    st.success(f"Based on the '{selected_scenario}' intervention, the predicted nutrient gap is small.")
+                    st.success(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is small.")
                 elif predicted_level_label == 'Significant Nutrient Gap':
-                    st.warning(f"Based on the '{selected_scenario}' intervention, the predicted nutrient gap is significant. This area may require targeted interventions.")
+                    st.warning(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is significant. This area may require targeted interventions.")
                 else:
-                    st.error(f"Based on the '{selected_scenario}' intervention, the predicted nutrient gap is severe. Urgent intervention may be needed in this area.")
+                    st.error(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is severe. Urgent intervention may be needed in this area.")
 
         except Exception as e:
             st.error(f"Error during simulation: {e}")
