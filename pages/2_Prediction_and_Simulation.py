@@ -179,7 +179,8 @@ if st.button("Get Initial Prediction"):
                 st.write(f"Warning: Input feature '{feature}' not found in the pipeline's expected columns.")
         
         st.subheader("Initial Input Data")
-        st.dataframe(input_df_full)
+        # Display only the selected features
+        st.dataframe(input_df_full[selected_features_names])
 
         initial_predicted_level_label = get_prediction_result(input_df_full, num_pipeline, model, nutrient_gap_labels)
         
@@ -244,6 +245,11 @@ selected_scenario = st.selectbox("Select an intervention scenario:", list(interv
 if st.button("Simulate Intervention"):
     if 'initial_input_df_full' in st.session_state:
         try:
+            # Display the initial data for comparison first
+            st.subheader("Initial Data (For Comparison)")
+            initial_df_to_display = st.session_state['initial_input_df_full'][selected_features_names]
+            st.dataframe(initial_df_to_display)
+            
             simulated_df_full = st.session_state['initial_input_df_full'].copy()
             scenario_impact = intervention_scenarios[selected_scenario]
 
@@ -254,7 +260,9 @@ if st.button("Simulate Intervention"):
                     st.write(f"Warning: Scenario impacts feature '{feature}' not found in the simulation dataframe.")
             
             st.subheader(f"Simulated Data after {selected_scenario} Intervention")
-            st.dataframe(simulated_df_full)
+            # Display only the selected features from the simulated data
+            simulated_df_to_display = simulated_df_full[selected_features_names]
+            st.dataframe(simulated_df_to_display)
 
             predicted_level_label = get_prediction_result(simulated_df_full, num_pipeline, model, nutrient_gap_labels)
             
