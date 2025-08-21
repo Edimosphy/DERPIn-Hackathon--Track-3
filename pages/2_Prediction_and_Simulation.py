@@ -53,13 +53,13 @@ num_pipeline.fit(X_for_pipeline_fit, y_for_pipeline_fit)
 selected_features_names = X_for_pipeline_fit.columns[num_pipeline.named_steps["selector"].get_support()]
 
 # --- Utility Function for Prediction ---
-
 def get_prediction_result(input_df_full, pipeline, model, labels):
     """
     Transforms the input data, makes a prediction, and returns the result.
     """
     try:
         # Transform the data using the fitted pipeline
+        # Use a copy to avoid a SettingWithCopyWarning
         processed_data = pipeline.transform(input_df_full.copy())
         
         # Make a prediction
@@ -74,95 +74,99 @@ def get_prediction_result(input_df_full, pipeline, model, labels):
         return None
 
 # --- Streamlit UI ---
-
 st.title("Nutrient Gap Prediction & Intervention Simulation")
 
 st.header("User Input Guide")
-st.write("Please use the following numerical codes for your input:")
+st.write("Input the corresponding numerical codes for your inputs")
 
 # Create a mapping from category code to region name for display
 category_region_map = nutrient_gap_original[['category', 'region']].drop_duplicates().set_index('category')['region'].to_dict()
 region_options = sorted(list(category_region_map.keys()))
 
 st.header("Nutrient Gap Prediction")
-st.write("Select a region to get the initial nutrient gap prediction.")
+st.write("Enter the feature values below to get the initial nutrient gap prediction.")
 
-# Create the input fields dynamically, now handling only category
+# Dictionary to hold all user inputs
 initial_input_data = {}
-selected_category = st.selectbox("Region (Category)", options=region_options, format_func=lambda x: category_region_map.get(x, x))
+
+# Create a separate selection for region
+selected_category = st.selectbox("Select a Region (Category)", options=region_options, format_func=lambda x: category_region_map.get(x, x))
 initial_input_data['category'] = selected_category
 
+# Create input fields for all selected features, except 'category'
+input_cols_for_ui = [col for col in selected_features_names if col != 'category']
+
+for feature in input_cols_for_ui:
+    display_label = feature.replace('_', ' ').title()
+    if feature in X_for_pipeline_fit.columns:
+        min_val = float(X_for_pipeline_fit[feature].min())
+        max_val = float(X_for_pipeline_fit[feature].max())
+        mean_val = float(X_for_pipeline_fit[feature].mean())
+        step_val = 1.0 if X_for_pipeline_fit[feature].nunique() <= 2 else None
+        initial_input_data[feature] = st.number_input(f"Enter a value for {display_label}", min_value=min_val, max_value=max_val, value=mean_val, step=step_val)
+    else:
+        initial_input_data[feature] = 0.0
 
 if st.button("Get Initial Prediction"):
     try:
         # Create a dataframe with all features and set their values
-        # All other features are defaulted to 0
         input_df_full = pd.DataFrame(np.zeros((1, X_for_pipeline_fit.shape[1])), columns=X_for_pipeline_fit.columns)
-        
-        # Set the category feature
-        if 'category' in input_df_full.columns:
-            input_df_full['category'] = initial_input_data['category']
+        for feature, value in initial_input_data.items():
+            if feature in input_df_full.columns:
+                input_df_full[feature] = value
 
-        st.subheader("Initial Input Data")
-        # Display all features that are used by the model
-        st.dataframe(input_df_full[selected_features_names])
-
-        initial_predicted_level_label = get_prediction_result(input_df_full, num_pipeline, model, nutrient_gap_labels)
-        selected_region_name = category_region_map.get(initial_input_data['category'], 'Unknown Region')
-        
-        if initial_predicted_level_label:
-            st.subheader(f"Initial Predicted Nutrient Gap Level in {selected_region_name}: {initial_predicted_level_label}")
-
-            initial_prediction_data = {'Nutrient Gap Level': [initial_predicted_level_label], 'Value': [1]}
-            initial_prediction_df = pd.DataFrame(initial_prediction_data)
-            plt.figure(figsize=(6, 4))
-            sns.barplot(data=initial_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
-            plt.title(f"Initial Predicted Nutrient Gap Level in {selected_region_name}")
-            plt.ylabel("")
-            plt.yticks([])
-            st.pyplot(plt)
-            plt.clf()
-
-            if initial_predicted_level_label == 'Small Nutrient Gap':
-                st.success("The initial prediction indicates a small nutrient gap. Continue monitoring and promoting healthy diets.")
-            elif initial_predicted_level_label == 'Significant Nutrient Gap':
-                st.warning("The initial prediction indicates a significant nutrient gap. Consider implementing targeted interventions to address this.")
-            else:
-                st.error("The initial prediction indicates a severe nutrient gap. Urgent and comprehensive interventions are highly recommended.")
-
-            st.session_state['initial_input_df_full'] = input_df_full
+        st.session_state['initial_input_df_full'] = input_df_full
+        st.session_state['initial_prediction_run'] = True
     except Exception as e:
-        st.error(f"Error during initial prediction: {e}")
+        st.error(f"Error during initial prediction setup: {e}")
 
+if 'initial_prediction_run' in st.session_state and st.session_state['initial_prediction_run']:
+    input_df_full = st.session_state['initial_input_df_full']
+    
+    st.subheader("Initial Input Data")
+    st.dataframe(input_df_full[selected_features_names])
+
+    initial_predicted_level_label = get_prediction_result(input_df_full, num_pipeline, model, nutrient_gap_labels)
+    selected_region_name = category_region_map.get(input_df_full['category'].iloc[0], 'Unknown Region')
+    
+    if initial_predicted_level_label:
+        st.subheader(f"Initial Predicted Nutrient Gap Level in {selected_region_name}: {initial_predicted_level_label}")
+
+        initial_prediction_data = {'Nutrient Gap Level': [initial_predicted_level_label], 'Value': [1]}
+        initial_prediction_df = pd.DataFrame(initial_prediction_data)
+        plt.figure(figsize=(6, 4))
+        sns.barplot(data=initial_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
+        plt.title(f"Initial Predicted Nutrient Gap Level in {selected_region_name}")
+        plt.ylabel("")
+        plt.yticks([])
+        st.pyplot(plt)
+        plt.clf()
+
+        if initial_predicted_level_label == 'Small Nutrient Gap':
+            st.success("The initial prediction indicates a small nutrient gap. Continue monitoring and promoting healthy diets.")
+        elif initial_predicted_level_label == 'Significant Nutrient Gap':
+            st.warning("The initial prediction indicates a significant nutrient gap. Consider implementing targeted interventions to address this.")
+        else:
+            st.error("The initial prediction indicates a severe nutrient gap. Urgent and comprehensive interventions are highly recommended.")
+
+# --- Intervention Simulation ---
 st.header("Intervention Simulation")
 st.write("Select an intervention scenario to see its potential impact on the nutrient gap level.")
 
 intervention_scenarios = {
     "No Intervention": {},
     "Increase in Nutritious Food": {
-        'avg_ca(mg)': 1.1,
-        'avg_thiamin(mg)': 1.1,
-        'avg_vitb12(mcg)': 1.1,
-        'pcfci': 0.9,
-        'avg_vita(mcg)': 1.1,
-        'avg_riboflavin(mg)': 1.1,
-        'avg_niacin(mg)': 1.1,
-        'millet(mt)': 1.2,
-        'sorghum(mt)': 1.2
+        'avg_ca(mg)': 1.1, 'avg_thiamin(mg)': 1.1, 'avg_vitb12(mcg)': 1.1,
+        'pcfci': 0.9, 'avg_vita(mcg)': 1.1, 'avg_riboflavin(mg)': 1.1,
+        'avg_niacin(mg)': 1.1, 'millet(mt)': 1.2, 'sorghum(mt)': 1.2
     },
     "Promote Fortified Foods": {
-        'avg_ca(mg)': 1.1,
-        'avg_thiamin(mg)': 1.1,
-        'avg_vitb12(mcg)': 1.1,
-        'pcfci': 0.9,
-        'avg_vita(mcg)': 1.1,
-        'avg_riboflavin(mg)': 1.1,
+        'avg_ca(mg)': 1.1, 'avg_thiamin(mg)': 1.1, 'avg_vitb12(mcg)': 1.1,
+        'pcfci': 0.9, 'avg_vita(mcg)': 1.1, 'avg_riboflavin(mg)': 1.1,
         'avg_niacin(mg)': 1.1
     },
     "Improve Climate Resilience": {
-        'pcfci': 0.9,
-        'sorghum(mt)': 1.3,
-        'millet(mt)': 1.3
+        'pcfci': 0.9, 'sorghum(mt)': 1.3, 'millet(mt)': 1.3
     }
 }
 
@@ -171,11 +175,6 @@ selected_scenario = st.selectbox("Select an intervention scenario:", list(interv
 if st.button("Simulate Intervention"):
     if 'initial_input_df_full' in st.session_state:
         try:
-            # Display the initial data for comparison first
-            st.subheader("Initial Data (For Comparison)")
-            initial_df_to_display = st.session_state['initial_input_df_full'][selected_features_names]
-            st.dataframe(initial_df_to_display)
-            
             simulated_df_full = st.session_state['initial_input_df_full'].copy()
             scenario_impact = intervention_scenarios[selected_scenario]
 
@@ -186,13 +185,10 @@ if st.button("Simulate Intervention"):
                     st.write(f"Warning: Scenario impacts feature '{feature}' not found in the simulation dataframe.")
             
             st.subheader(f"Simulated Data after {selected_scenario} Intervention")
-            # Display only the selected features from the simulated data
-            simulated_df_to_display = simulated_df_full[selected_features_names]
-            st.dataframe(simulated_df_to_display)
+            st.dataframe(simulated_df_full[selected_features_names])
 
             predicted_level_label = get_prediction_result(simulated_df_full, num_pipeline, model, nutrient_gap_labels)
             
-            # Get the region name from the initial state
             initial_category = st.session_state['initial_input_df_full']['category'].iloc[0]
             selected_region_name = category_region_map.get(initial_category, 'Unknown Region')
 
