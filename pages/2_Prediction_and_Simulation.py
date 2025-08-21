@@ -77,7 +77,15 @@ def get_prediction_result(input_df_full, pipeline, model, labels):
 st.title("Nutrient Gap Prediction & Intervention Simulation")
 
 st.header("User Input Guide")
-st.write("Input the corresponding numerical codes for your inputs")
+st.write("Input the corresponding numerical codes for your inputs.")
+
+#PCFCI Code
+
+st.write("pcfci code guide")
+st.write("""Vulnerability Level: Use the slider to pick your range value
+0.0: Vulnerable
+1.0: Not Vulnerable
+""")
 
 # Create a mapping from category code to region name for display
 category_region_map = nutrient_gap_original[['category', 'region']].drop_duplicates().set_index('category')['region'].to_dict()
@@ -180,7 +188,8 @@ intervention_scenarios = {
         'avg_riboflavin(mg)', 'avg_niacin(mg)'
     ],
     "Improve Climate Resilience": [
-        'pcfci', 'sorghum(mt)', 'millet(mt)'
+        'pcfci', 'sorghum(mt)', 'millet(mt)','avg_vitb12(mcg)', 'avg_vita(mcg)', 
+        'avg_riboflavin(mg)', 'avg_niacin(mg)'
     ]
 }
 
@@ -208,7 +217,7 @@ if st.button("Simulate Intervention"):
                 if feature in simulated_df_full.columns:
                     # 'pcfci' is a price index, so a positive intervention means a decrease in value
                     if feature == 'pcfci':
-                        multiplier = 1 - percentage_decimal
+                        multiplier = 1 + percentage_decimal
                         simulated_df_full[feature] *= multiplier
                     # All other features are nutrients or crop yields, so a positive intervention means an increase
                     else:
