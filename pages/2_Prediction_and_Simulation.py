@@ -19,13 +19,14 @@ try:
     
     # Ensure encoded target column is integer type
     if 'nutrient_gap_level_encoded' in nutrient_gap_encoded.columns:
-        nutrient_gap_encoded['nutrient_gap_level_encoded'] = nutrient_gap_encoded['nutrient_gap_level_encoded'].astype(int)
+         nutrient_gap_encoded['nutrient_gap_level_encoded'] = nutrient_gap_encoded['nutrient_gap_level_encoded'].astype(int)
 
     # Load the trained model
     model = joblib.load('nutrient_gap_model.pkl')
 
     # Create the label encoder and mapping globally
     label_encoder = LabelEncoder()
+    # Fit on the original data to get the correct mapping
     label_encoder.fit(nutrient_gap_original['nutrient_gap_level'])
     nutrient_gap_labels = {
         0: 'Small Nutrient Gap',
@@ -41,40 +42,78 @@ except Exception as e:
     st.stop()
 
 # --- Preprocessing Pipeline ---
+# Recreate the preprocessing pipeline and fit it
 num_pipeline = Pipeline([
     ("scalar", StandardScaler()),
     ("variance", VarianceThreshold(threshold=0.1)),
     ("selector", SelectKBest(score_func=f_classif))
 ])
 
-X_for_pipeline_fit = nutrient_gap_encoded.drop(
-    columns=["nutrient_gap_level_encoded", "category", "mnari", "nutrient_gap_level"],
-    errors='ignore'
-)
+# Define features and target for pipeline fitting
+X_for_pipeline_fit = nutrient_gap_encoded.drop(columns=["nutrient_gap_level_encoded", "category", "mnari", "nutrient_gap_level"], errors='ignore')
 y_for_pipeline_fit = nutrient_gap_encoded["nutrient_gap_level_encoded"]
-
 num_pipeline.fit(X_for_pipeline_fit, y_for_pipeline_fit)
 selected_features_names = X_for_pipeline_fit.columns[num_pipeline.named_steps["selector"].get_support()]
 
 # --- Utility Function for Prediction ---
+
 def get_prediction_result(input_df_full, pipeline, model, labels):
+    """
+    Transforms the input data, makes a prediction, and returns the result.
+    """
     try:
+        # Transform the data using the fitted pipeline
         processed_data = pipeline.transform(input_df_full)
+        
+        # Make a prediction
         predicted_level_encoded = model.predict(processed_data)[0]
+        
+        # Map the prediction to a human-readable label
         predicted_level_label = labels.get(int(predicted_level_encoded), 'Unknown')
+        
         return predicted_level_label
     except Exception as e:
         st.error(f"Error during prediction: {e}")
         return None
 
+def get_top_5_gaps(input_data, labels_map):
+    """
+    Identifies the top 5 most significant nutrient gaps from the input data.
+    A lower value indicates a more significant gap.
+    """
+    nutrient_features = [
+        'avg_kcalories', 'avg_ca(mg)', 'avg_folate(mcg)', 'avg_iron(mg)',
+        'avg_niacin(mg)', 'avg_riboflavin(mg)', 'avg_thiamin(mg)',
+        'avg_vita(mcg)', 'avg_vitb12(mcg)', 'avg_vitb6(mg)', 'avg_zinc(mg)'
+    ]
+    
+    # Filter the input data to only include nutrient features
+    nutrient_values = {
+        key: input_data[key] for key in input_data.columns if key in nutrient_features
+    }
+    
+    # Sort the nutrients by their value (lowest first)
+    sorted_nutrients = sorted(nutrient_values.items(), key=lambda item: item[1])
+    
+    # Get the top 5 gaps
+    top_5_gaps = []
+    for feature, value in sorted_nutrients[:5]:
+        display_name = labels_map.get(feature, feature)
+        top_5_gaps.append({'Nutrient': display_name, 'Value': value})
+        
+    return top_5_gaps
+
 # --- Streamlit UI ---
+
 st.title("Nutrient Gap Prediction & Intervention Simulation")
 
 st.header("User Input Guide")
 st.write("Input the corresponding numerical codes for your inputs")
 
-# Regional codes
 st.write("### Regional Codes Guide")
+st.write("Please use the following numerical codes for your input:")
+
+# Display the information using markdown formatting
 st.write("""
 | Code | Region Name  |
 |:----:|:-------------|
@@ -90,8 +129,8 @@ st.write("""
 | 9    | Western      |
 """)
 
-# PCFCI codes
 st.write("### PCFCI Codes Guide")
+st.write("Please use the following numerical codes for the **PCFCi** field:")
 st.write("""
 | Value | Vulnerability Level |
 |:-----:|:--------------------|
@@ -99,32 +138,34 @@ st.write("""
 | 1.0   | Not Vulnerable      |
 """)
 
-# VCCI codes
+# VCCI
 st.write("### VCCI Codes Guide")
+st.write("Please use the following numerical codes for the **VCCi** field:")
 st.write("""
 | Value | Vulnerability Level |
 |:-----:|:--------------------|
 | 0.0   | Not Vulnerable      |
-| 1.0   | Vulnerable          |
+| 1.0   | Vulnerable      |
 """)
 
+# Recreate the preprocessing pipeline and fit it
 category_region_map = nutrient_gap_original[['category', 'region']].drop_duplicates().set_index('category')['region'].to_dict()
 
 feature_labels = {
     'category': 'Region (Category)',
-    'pcfci': 'Per Capita Food Consumption Index (PCFCI)',
-    'avg_kcalories': 'Average Kilocalories (%)',
-    'avg_ca(mg)': 'Average Calcium (mg) (%)',
-    'avg_folate(mcg)': 'Average Folate (mcg) (%)',
-    'avg_iron(mg)': 'Average Iron (mg) (%)',
-    'avg_niacin(mg)': 'Average Niacin (mg) (%)',
-    'avg_riboflavin(mg)': 'Average Riboflavin (mg) (%)',
-    'avg_thiamin(mg)': 'Average Thiamin (mg) (%)',
-    'avg_vita(mcg)': 'Average Vitamin A (mcg) (%)',
-    'avg_vitb12(mcg)': 'Average Vitamin B12 (mcg) (%)',
-    'avg_vitb6(mg)': 'Average Vitamin B6 (mg) (%)',
-    'avg_zinc(mg)': 'Average Zinc (mg) (%)',
-    'vcci': 'Vulnerability to Climate Change Index (VCCI)',
+    'pcfci': 'Per Capita Food Consumption Index(PCFCI)',
+    'avg_kcalories': 'Average Kilocalories(%)',
+    'avg_ca(mg)': 'Average Calcium (mg)(%)',
+    'avg_folate(mcg)': 'Average Folate (mcg)(%)',
+    'avg_iron(mg)': 'Average Iron (mg)(%)',
+    'avg_niacin(mg)': 'Average Niacin (mg)(%)',
+    'avg_riboflavin(mg)': 'Average Riboflavin (mg)(%)',
+    'avg_thiamin(mg)': 'Average Thiamin (mg)(%)',
+    'avg_vita(mcg)': 'Average Vitamin A (mcg)(%)',
+    'avg_vitb12(mcg)': 'Average Vitamin B12 (mcg)(%)',
+    'avg_vitb6(mg)': 'Average Vitamin B6 (mg)(%)',
+    'avg_zinc(mg)': 'Average Zinc (mg)(%)',
+    'vcci': 'Vulnerability to Climate Change Index(VCCI)',
     'maize(mt)': 'Maize Production (amt)',
     'rice(mt)': 'Rice Production (amt)',
     'sorghum(mt)': 'Sorghum Production (amt)',
@@ -132,31 +173,32 @@ feature_labels = {
     'millet(mt)': 'Millet Production (amt)',
     'price': 'Commodity Price',
 }
+    
+# Add one-hot encoded labels
 for col in X_for_pipeline_fit.columns:
     if col.startswith('commodity_'):
         feature_labels[col] = f"Commodity: {col.replace('commodity_', '')} (0 or 1)"
 
 st.header("Nutrient Gap Prediction")
-initial_input_data = {}
+st.write("Enter the feature values below to get the initial nutrient gap prediction.")
 
+initial_input_data = {}
 for feature in selected_features_names:
     display_label = feature_labels.get(feature, feature)
     if feature == 'category':
         category_options = sorted(list(category_region_map.keys()))
-        selected_category = st.selectbox(display_label, options=category_options,
-                                         format_func=lambda x: category_region_map.get(x, x))
+        selected_category = st.selectbox(display_label, options=category_options, format_func=lambda x: category_region_map.get(x, x))
         initial_input_data[feature] = selected_category
     elif feature in X_for_pipeline_fit.columns:
         min_val = float(X_for_pipeline_fit[feature].min())
         max_val = float(X_for_pipeline_fit[feature].max())
         mean_val = float(X_for_pipeline_fit[feature].mean())
-        step_val = 1.0 if X_for_pipeline_fit[feature].nunique() <= 2 else 0.1
-        initial_input_data[feature] = st.number_input(display_label, min_value=min_val,
-                                                      max_value=max_val, value=mean_val,
-                                                      step=step_val)
+        step_val = 1.0 if X_for_pipeline_fit[feature].nunique() <= 2 else None
+        initial_input_data[feature] = st.number_input(display_label, min_value=min_val, max_value=max_val, value=mean_val, step=step_val)
     else:
         st.write(f"Warning: Input for {feature} not directly available. Using default 0.")
         initial_input_data[feature] = 0.0
+
 
 if st.button("Get Initial Prediction"):
     try:
@@ -164,47 +206,67 @@ if st.button("Get Initial Prediction"):
         for feature, value in initial_input_data.items():
             if feature in input_df_full.columns:
                 input_df_full[feature] = value
+            else:
+                st.write(f"Warning: Input feature '{feature}' not found in the pipeline's expected columns.")
+        
+        st.subheader("Initial Input Data")
+        st.dataframe(input_df_full)
 
         initial_predicted_level_label = get_prediction_result(input_df_full, num_pipeline, model, nutrient_gap_labels)
         
         if initial_predicted_level_label:
             st.subheader(f"Initial Predicted Nutrient Gap Level: {initial_predicted_level_label}")
 
-            initial_prediction_df = pd.DataFrame({'Nutrient Gap Level': [initial_predicted_level_label], 'Value': [1]})
+            initial_prediction_data = {'Nutrient Gap Level': [initial_predicted_level_label], 'Value': [1]}
+            initial_prediction_df = pd.DataFrame(initial_prediction_data)
             plt.figure(figsize=(6, 4))
             sns.barplot(data=initial_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
             plt.title("Initial Predicted Nutrient Gap Level")
             plt.ylabel("")
             plt.yticks([])
             st.pyplot(plt)
-            plt.close()
+            plt.clf()
 
             if initial_predicted_level_label == 'Small Nutrient Gap':
-                st.success("The prediction indicates a small nutrient gap. Continue monitoring and promoting healthy diets.")
+                st.success("The initial prediction indicates a small nutrient gap. Continue monitoring and promoting healthy diets.")
             elif initial_predicted_level_label == 'Significant Nutrient Gap':
-                st.warning("The prediction indicates a significant nutrient gap. Consider implementing targeted interventions.")
+                st.warning("The initial prediction indicates a significant nutrient gap. Consider implementing targeted interventions to address this.")
             else:
-                st.error("The prediction indicates a severe nutrient gap. Urgent interventions are highly recommended.")
+                st.error("The initial prediction indicates a severe nutrient gap. Urgent and comprehensive interventions are highly recommended.")
 
             st.session_state['initial_input_df_full'] = input_df_full
     except Exception as e:
         st.error(f"Error during initial prediction: {e}")
 
 st.header("Intervention Simulation")
+st.write("Select an intervention scenario to see its potential impact on the nutrient gap level.")
+
 intervention_scenarios = {
     "No Intervention": {},
     "Increase in Nutritious Food": {
-        'avg_ca(mg)': 1.1, 'avg_thiamin(mg)': 1.1, 'avg_vitb12(mcg)': 1.1,
-        'pcfci': 0.9, 'avg_vita(mcg)': 1.1, 'avg_riboflavin(mg)': 1.1,
-        'avg_niacin(mg)': 1.1, 'millet(mt)': 1.2, 'sorghum(mt)': 1.2
+        'avg_ca(mg)': 1.1,
+        'avg_thiamin(mg)': 1.1,
+        'avg_vitb12(mcg)': 1.1,
+        'pcfci': 0.9,
+        'avg_vita(mcg)': 1.1,
+        'avg_riboflavin(mg)': 1.1,
+        'avg_niacin(mg)': 1.1,
+        'millet(mt)': 1.2,
+        'sorghum(mt)': 1.2
     },
     "Promote Fortified Foods": {
-        'avg_ca(mg)': 1.1, 'avg_thiamin(mg)': 1.1, 'avg_vitb12(mcg)': 1.1,
-        'pcfci': 0.9, 'avg_vita(mcg)': 1.1, 'avg_riboflavin(mg)': 1.1,
+        'avg_ca(mg)': 1.1,
+        'avg_thiamin(mg)': 1.1,
+        'avg_vitb12(mcg)': 1.1,
+        'pcfci': 0.9,
+        'avg_vita(mcg)': 1.1,
+        'avg_riboflavin(mg)': 1.1,
         'avg_niacin(mg)': 1.1
     },
     "Improve Climate Resilience": {
-        'pcfci': 0.9, 'sorghum(mt)': 1.3, 'millet(mt)': 1.3
+        'pcfci': 0.9,
+        'sorghum(mt)': 1.3,
+        'millet(mt)': 1.3
     }
 }
 
@@ -214,29 +276,40 @@ if st.button("Simulate Intervention"):
     if 'initial_input_df_full' in st.session_state:
         try:
             simulated_df_full = st.session_state['initial_input_df_full'].copy()
-            for feature, multiplier in intervention_scenarios[selected_scenario].items():
+            scenario_impact = intervention_scenarios[selected_scenario]
+
+            for feature, multiplier in scenario_impact.items():
                 if feature in simulated_df_full.columns:
                     simulated_df_full[feature] *= multiplier
+                else:
+                    st.write(f"Warning: Scenario impacts feature '{feature}' not found in the simulation dataframe.")
+            
+            st.subheader(f"Simulated Data after {selected_scenario} Intervention")
+            st.dataframe(simulated_df_full)
 
             predicted_level_label = get_prediction_result(simulated_df_full, num_pipeline, model, nutrient_gap_labels)
+            
             if predicted_level_label:
                 st.subheader(f"Predicted Nutrient Gap Level after {selected_scenario}: {predicted_level_label}")
 
-                simulated_prediction_df = pd.DataFrame({'Nutrient Gap Level': [predicted_level_label], 'Value': [1]})
+                simulated_prediction_data = {'Nutrient Gap Level': [predicted_level_label], 'Value': [1]}
+                simulated_prediction_df = pd.DataFrame(simulated_prediction_data)
+
                 plt.figure(figsize=(6, 4))
                 sns.barplot(data=simulated_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
                 plt.title(f"Predicted Nutrient Gap Level after {selected_scenario}")
                 plt.ylabel("")
                 plt.yticks([])
                 st.pyplot(plt)
-                plt.close()
+                plt.clf()
 
                 if predicted_level_label == 'Small Nutrient Gap':
-                    st.success(f"Based on '{selected_scenario}', the predicted nutrient gap is small.")
+                    st.success(f"Based on the '{selected_scenario}' intervention, the predicted nutrient gap is small.")
                 elif predicted_level_label == 'Significant Nutrient Gap':
-                    st.warning(f"Based on '{selected_scenario}', the predicted nutrient gap is significant.")
+                    st.warning(f"Based on the '{selected_scenario}' intervention, the predicted nutrient gap is significant. This area may require targeted interventions.")
                 else:
-                    st.error(f"Based on '{selected_scenario}', the predicted nutrient gap is severe.")
+                    st.error(f"Based on the '{selected_scenario}' intervention, the predicted nutrient gap is severe. Urgent intervention may be needed in this area.")
+
         except Exception as e:
             st.error(f"Error during simulation: {e}")
     else:
