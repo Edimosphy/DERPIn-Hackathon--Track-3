@@ -13,3 +13,19 @@ This application provides data visualizations, a predictive model, and intervent
 - **Data Visualizations**: Explore key data trends, key insights and recommendations.
 - **Prediction Model and Simulation Intervention**: Use the predictive model to forecast nutrient gaps and simulate the impact of various interventions.
 """)
+
+st.header("Term for User Guide")
+st.write("Know the meaning of term and what it stands for.")
+
+# Display the information using markdown formatting
+st.write("""
+| Term |                Meaning of Term             | Vulnerability Level | Vunerability Level Code | Nutrient gap Indicator |
+|:----:|:-------------------------------------------|:--------------------|:------------------------|:-----------------------|
+| mnari|    Mean Nutrient Adequate Ratio Index      |     Vulnerable      |         1               |      Severe            |
+|      |                                            |   Invulnerale       |         0               |    Not Severe          |
+| pcfci|   Per Capita Food Consumption Index        |   Invulnerable      |         1               |    Not Severe          |
+|      |                                            |     Vulnerale       |         0               |      Severe            |
+| vcci |   Vulnerability to Climate Change Index    |     Vulnerable      |         1               |      Severe            |
+|      |                                            |   Invulnerale       |         0               |    Not Severe          |
+ 
+""")
