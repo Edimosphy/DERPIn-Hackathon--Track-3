@@ -1,4 +1,5 @@
-# DERPIn-Hackathon--Track-3
+# DERPIn Hackathon Track 3 Documentation
+
 # Inclusive Nutrition Policies: Nutrient & Hidden Hunger Insights (Case study = Ghana)
 This project is developed as part of the Hackathon Challenge Track 3, focuses on identifying nutrient gaps and hidden hunger in Africa using data-driven approaches. The goal is to provide insights and tools for policymakers and community leaders to develop inclusive and targeted nutrition policies.
 
