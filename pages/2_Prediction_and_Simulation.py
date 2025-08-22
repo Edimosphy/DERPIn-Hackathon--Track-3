@@ -81,10 +81,7 @@ st.write("Input the corresponding numerical codes for your inputs.")
 
 # PCFCI Code
 st.write("pcfci code guide")
-st.write("""Vulnerability Level: Use the slider to pick your range value, 
-0.0: Vulnerable, 
-1.0: Not Vulnerable
-""")
+st.write("Check home page for guide")
 
 # Create a mapping from category code to region name for display
 category_region_map = nutrient_gap_original[['category', 'region']].drop_duplicates().set_index('category')['region'].to_dict()
