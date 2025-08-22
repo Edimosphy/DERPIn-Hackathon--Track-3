@@ -149,6 +149,7 @@ if st.button("Get Initial Prediction"):
         st.session_state['initial_prediction_run'] = True
         st.session_state['initial_prediction_label'] = initial_predicted_level_label
         st.session_state['initial_region_name'] = selected_region_name
+        st.session_state['simulation_run'] = False # Reset simulation state
 
     except Exception as e:
         st.error(f"Error during initial prediction setup: {e}")
@@ -168,7 +169,7 @@ if 'initial_prediction_run' in st.session_state and st.session_state['initial_pr
         initial_prediction_data = {'Nutrient Gap Level': [initial_predicted_level_label], 'Value': [1]}
         initial_prediction_df = pd.DataFrame(initial_prediction_data)
 
-        # Use columns for side-by-side display
+        # Use columns for side-by-side display of graphs
         col1, col2 = st.columns(2)
         with col1:
             plt.figure(figsize=(6, 4))
@@ -241,31 +242,51 @@ if st.button("Simulate Intervention"):
 
             predicted_level_label = get_prediction_result(simulated_df_full, num_pipeline, model, nutrient_gap_labels)
 
-            st.subheader(f"Simulation Result for {selected_scenario} at {intervention_percentage}% Impact")
-
-            simulated_prediction_data = {'Nutrient Gap Level': [predicted_level_label], 'Value': [1]}
-            simulated_prediction_df = pd.DataFrame(simulated_prediction_data)
-            
-            # Use the second column for the simulated graph
-            with col2:
-                plt.figure(figsize=(6, 4))
-                sns.barplot(data=simulated_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
-                plt.title("Simulated Prediction")
-                plt.ylabel("")
-                plt.yticks([])
-                st.pyplot(plt)
-                plt.clf()
-
-
-            if predicted_level_label == 'Small Nutrient Gap':
-                st.success(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the nutrient gap has improved. Nutrient adequate")
-            elif predicted_level_label == 'Significant Nutrient Gap':
-                st.warning(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the nutrient gap has slightly improved. Continue with the intervention to have nutrient adequate in the region")
-            else:
-                st.error(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the nutrient gap still need urgent attention. Continue with the intervention to improve the nutrient deficiency")
+            # Store the simulated dataframe for comparison
+            st.session_state['simulated_df_full'] = simulated_df_full
+            st.session_state['simulation_run'] = True
+            st.session_state['simulated_prediction_label'] = predicted_level_label
+            st.session_state['simulated_scenario'] = selected_scenario
+            st.session_state['simulated_percentage'] = intervention_percentage
 
         except Exception as e:
             st.error(f"Error during simulation: {e}")
     else:
         st.warning("Please get the initial prediction first before simulating interventions.")
 
+# --- Display Simulation Results (including dataframes and graphs) ---
+if 'simulation_run' in st.session_state and st.session_state['simulation_run']:
+    st.subheader("Input Data Comparison")
+    
+    initial_df = st.session_state['initial_input_df_full'][selected_features_names].T
+    initial_df.columns = ["Initial Value"]
+    
+    simulated_df = st.session_state['simulated_df_full'][selected_features_names].T
+    simulated_df.columns = ["Simulated Value"]
+    
+    comparison_df = pd.concat([initial_df, simulated_df], axis=1)
+    st.dataframe(comparison_df)
+    
+    st.subheader(f"Simulation Result for {st.session_state['simulated_scenario']} at {st.session_state['simulated_percentage']}% Impact")
+
+    simulated_prediction_data = {'Nutrient Gap Level': [st.session_state['simulated_prediction_label']], 'Value': [1]}
+    simulated_prediction_df = pd.DataFrame(simulated_prediction_data)
+    
+    # Use the second column for the simulated graph
+    with col2:
+        plt.figure(figsize=(6, 4))
+        sns.barplot(data=simulated_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
+        plt.title("Simulated Prediction")
+        plt.ylabel("")
+        plt.yticks([])
+        st.pyplot(plt)
+        plt.clf()
+
+    predicted_level_label = st.session_state['simulated_prediction_label']
+    
+    if predicted_level_label == 'Small Nutrient Gap':
+        st.success(f"Based on the '{st.session_state['simulated_scenario']}' intervention with a {st.session_state['simulated_percentage']}% impact, the nutrient gap has improved. Nutrient adequate")
+    elif predicted_level_label == 'Significant Nutrient Gap':
+        st.warning(f"Based on the '{st.session_state['simulated_scenario']}' intervention with a {st.session_state['simulated_percentage']}% impact, the nutrient gap has slightly improved. Continue with the intervention to have nutrient adequate in the region")
+    else:
+        st.error(f"Based on the '{st.session_state['simulated_scenario']}' intervention with a {st.session_state['simulated_percentage']}% impact, the nutrient gap still need urgent attention. Continue with the intervention to improve the nutrient deficiency")
