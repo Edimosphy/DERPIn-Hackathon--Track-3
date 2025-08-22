@@ -35,7 +35,7 @@ The project followed these key steps:
 - Intervention Simulation: Implementing a feature to simulate the potential impact of different interventions on nutrient gap levels.
 - Visualization and Reporting: Developing an interactive Streamlit dashboard to visualize the data, provide predictions, and simulate interventions.
 
-##Model Development 
+## Model Development 
 This prediction was based using a classification model algorithms.
 The model training and evaluation was done using the following models:
 - Logistics Regression
