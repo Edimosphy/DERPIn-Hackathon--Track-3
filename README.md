@@ -35,6 +35,19 @@ The project followed these key steps:
 - Intervention Simulation: Implementing a feature to simulate the potential impact of different interventions on nutrient gap levels.
 - Visualization and Reporting: Developing an interactive Streamlit dashboard to visualize the data, provide predictions, and simulate interventions.
 
+##Model Development 
+This prediction was based using a classification model algorithms.
+The model training and evaluation was done using the following models:
+- Logistics Regression
+- Decision Tree Classifier
+- Random Forest Classifier.
+
+These models had a 100% accuracy score and F1-score.
+
+The models were checked to confirm there was no data leakage.
+- This high performance might be as the results of the highly correlation features with the target variables.
+- The random forest model was saved because of its characteristics and to capture more non-linear relationship with future dataset
+
 ## Key Insights
 Based on the analysis of the Ghana nutrition data:
 - Regional Disparities: There are significant regional differences in nutrient adequacy across Ghana, with Eastern and Central regions showing higher nutrient gaps compared to Upper West and Upper East.
