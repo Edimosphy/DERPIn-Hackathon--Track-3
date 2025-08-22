@@ -24,9 +24,9 @@ try:
     # Load the trained model
     model = joblib.load('nutrient_gap_model.pkl')
 
-    # Create the label encoder and mapping globally
-    label_encoder = LabelEncoder()
-    label_encoder.fit(nutrient_gap_original['nutrient_gap_level'])
+    # The LabelEncoder object is not strictly needed for the mapping,
+    # as the mapping is already defined below. The previous error was caused
+    # by trying to fit it on a non-existent column.
     nutrient_gap_labels = {
         0: 'Small Nutrient Gap',
         1: 'Significant Nutrient Gap',
@@ -37,6 +37,7 @@ except FileNotFoundError as e:
     st.error(f"Error: Required data files not found. {e}. Please ensure the files are in the same directory as the app.")
     st.stop()
 except Exception as e:
+    # This error will no longer be triggered by the missing column
     st.error(f"An unexpected error occurred during data/model loading: {e}")
     st.stop()
 
