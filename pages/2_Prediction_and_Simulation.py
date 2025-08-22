@@ -129,6 +129,7 @@ for feature in input_cols_for_ui:
             max_value=max_val,
             value=default_val,
             step=0.0
+        )
             
     elif feature in X_for_pipeline_fit.columns:
         min_val = 0.0
