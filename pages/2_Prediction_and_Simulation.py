@@ -303,4 +303,4 @@ if 'simulation_run' in st.session_state and st.session_state['simulation_run']:
     elif predicted_level_label == 'Significant Nutrient Gap':
         st.warning(f"Based on the '{st.session_state['simulated_scenario']}' intervention with a {st.session_state['simulated_percentage']}% impact, the nutrient gap has slightly improved. Continue with the intervention to have nutrient adequate in the region")
     else:
-        st.error(f"Based on the '{st.session_state['simulated_scenario']}' intervention with a {st.session_state['simulated_percentage']}% impact, the nutrient gap still need urgent attention. Continue with the intervention to improve the nutrient deficiency")
+        st.error(f"Based on the '{st.session_state['simulated_scenario']}' intervention with a {st.session_state['simulated_percentage']}% impact, the nutrient gap still need urgent attention. Continue with all the above interventions to reduce the severe nutrient gap in the region.")
