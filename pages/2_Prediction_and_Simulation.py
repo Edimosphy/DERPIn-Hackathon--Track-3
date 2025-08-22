@@ -115,8 +115,21 @@ for feature in input_cols_for_ui:
             min_value=min_val,
             max_value=max_val,
             value=default_val,
-            step=1.0
+            step=0.01
         )
+
+    elif feature in ['pcfci']:
+        min_val = 0.0
+        max_val = 1.0
+        mean_val = float(X_for_pipeline_fit[feature].mean())
+        default_val = max(min(mean_val, max_val), min_val)
+        initial_input_data[feature] = st.slider(
+            f"Select a value for {display_label}",
+            min_value=min_val,
+            max_value=max_val,
+            value=default_val,
+            step=0.0
+            
     elif feature in X_for_pipeline_fit.columns:
         min_val = 0.0
         max_val = 100.0
