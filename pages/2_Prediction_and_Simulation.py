@@ -210,15 +210,15 @@ intervention_scenarios = {
     "No Intervention": [],
     "Increase in Nutritious Food": [
         'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)',
-        'avg_riboflavin(mg)', 'avg_niacin(mg)', 'millet(mt)', 'sorghum(mt)', 'pcfci'
+        'avg_riboflavin(mg)', 'avg_niacin(mg)', 'millet(mt)', 'sorghum(mt)', 'pcfci','avg_vitb6(mg)'
     ],
     "Promote Fortified Foods": [
         'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)',
-        'avg_riboflavin(mg)', 'avg_niacin(mg)','pcfci'
+        'avg_riboflavin(mg)', 'avg_niacin(mg)','pcfci','avg_vitb6(mg)'
     ],
     "Improve Climate Resilience": [
         'pcfci', 'sorghum(mt)', 'millet(mt)','avg_vitb12(mcg)', 'avg_vita(mcg)',
-        'avg_riboflavin(mg)', 'avg_niacin(mg)'
+        'avg_riboflavin(mg)', 'avg_niacin(mg)','avg_vitb6(mg)','avg_thiamin(mg)'
     ]
 }
 
