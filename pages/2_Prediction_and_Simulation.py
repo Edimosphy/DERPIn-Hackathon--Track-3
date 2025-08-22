@@ -16,10 +16,10 @@ try:
     # Load data and model
     nutrient_gap_original = pd.read_csv('nutrient_gap.csv')
     nutrient_gap_encoded = pd.read_csv('nutrient_gap_encoded.csv')
-    
+
     # Ensure encoded target column is integer type
     if 'nutrient_gap_level_encoded' in nutrient_gap_encoded.columns:
-         nutrient_gap_encoded['nutrient_gap_level_encoded'] = nutrient_gap_encoded['nutrient_gap_level_encoded'].astype(int)
+        nutrient_gap_encoded['nutrient_gap_level_encoded'] = nutrient_gap_encoded['nutrient_gap_level_encoded'].astype(int)
 
     # Load the trained model
     model = joblib.load('nutrient_gap_model.pkl')
@@ -61,13 +61,13 @@ def get_prediction_result(input_df_full, pipeline, model, labels):
         # Transform the data using the fitted pipeline
         # Use a copy to avoid a SettingWithCopyWarning
         processed_data = pipeline.transform(input_df_full.copy())
-        
+
         # Make a prediction
         predicted_level_encoded = model.predict(processed_data)[0]
-        
+
         # Map the prediction to a human-readable label
         predicted_level_label = labels.get(int(predicted_level_encoded), 'Unknown')
-        
+
         return predicted_level_label
     except Exception as e:
         st.error(f"Error during prediction: {e}")
@@ -79,8 +79,7 @@ st.title("Nutrient Gap Prediction & Intervention Simulation")
 st.header("User Input Guide")
 st.write("Input the corresponding numerical codes for your inputs.")
 
-#PCFCI Code
-
+# PCFCI Code
 st.write("pcfci code guide")
 st.write("""Vulnerability Level: Use the slider to pick your range value
 0.0: Vulnerable
@@ -110,21 +109,21 @@ for feature in input_cols_for_ui:
         min_val = float(X_for_pipeline_fit[feature].min())
         max_val = float(X_for_pipeline_fit[feature].max())
         mean_val = float(X_for_pipeline_fit[feature].mean())
-        
+
         # Check if the feature is binary (e.g., PCFCI or VCCI)
         if X_for_pipeline_fit[feature].nunique() <= 2:
             initial_input_data[feature] = st.number_input(
-                f"Enter a value for {display_label}", 
-                min_value=min_val, 
-                max_value=max_val, 
-                value=mean_val, 
+                f"Enter a value for {display_label}",
+                min_value=min_val,
+                max_value=max_val,
+                value=mean_val,
                 step=1.0
             )
         else:
             initial_input_data[feature] = st.slider(
-                f"Select a value for {display_label}", 
-                min_value=min_val, 
-                max_value=max_val, 
+                f"Select a value for {display_label}",
+                min_value=min_val,
+                max_value=max_val,
                 value=mean_val
             )
     else:
@@ -138,32 +137,43 @@ if st.button("Get Initial Prediction"):
             if feature in input_df_full.columns:
                 input_df_full[feature] = value
 
+        # Get initial prediction and store it in session state
+        initial_predicted_level_label = get_prediction_result(input_df_full, num_pipeline, model, nutrient_gap_labels)
+        selected_region_name = category_region_map.get(input_df_full['category'].iloc[0], 'Unknown Region')
+
         st.session_state['initial_input_df_full'] = input_df_full
         st.session_state['initial_prediction_run'] = True
+        st.session_state['initial_prediction_label'] = initial_predicted_level_label
+        st.session_state['initial_region_name'] = selected_region_name
+
     except Exception as e:
         st.error(f"Error during initial prediction setup: {e}")
 
+# --- Display Initial Prediction ---
 if 'initial_prediction_run' in st.session_state and st.session_state['initial_prediction_run']:
     input_df_full = st.session_state['initial_input_df_full']
-    
+    initial_predicted_level_label = st.session_state['initial_prediction_label']
+    selected_region_name = st.session_state['initial_region_name']
+
     st.subheader("Initial Input Data")
     st.dataframe(input_df_full[selected_features_names])
 
-    initial_predicted_level_label = get_prediction_result(input_df_full, num_pipeline, model, nutrient_gap_labels)
-    selected_region_name = category_region_map.get(input_df_full['category'].iloc[0], 'Unknown Region')
-    
     if initial_predicted_level_label:
         st.subheader(f"Initial Predicted Nutrient Gap Level in {selected_region_name}: {initial_predicted_level_label}")
 
         initial_prediction_data = {'Nutrient Gap Level': [initial_predicted_level_label], 'Value': [1]}
         initial_prediction_df = pd.DataFrame(initial_prediction_data)
-        plt.figure(figsize=(6, 4))
-        sns.barplot(data=initial_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
-        plt.title(f"Initial Predicted Nutrient Gap Level in {selected_region_name}")
-        plt.ylabel("")
-        plt.yticks([])
-        st.pyplot(plt)
-        plt.clf()
+
+        # Use columns for side-by-side display
+        col1, col2 = st.columns(2)
+        with col1:
+            plt.figure(figsize=(6, 4))
+            sns.barplot(data=initial_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
+            plt.title("Initial Prediction")
+            plt.ylabel("")
+            plt.yticks([])
+            st.pyplot(plt)
+            plt.clf()
 
         if initial_predicted_level_label == 'Small Nutrient Gap':
             st.success("The initial prediction indicates a small nutrient gap. Continue monitoring and promoting healthy diets.")
@@ -180,15 +190,15 @@ st.write("Select an intervention scenario and its intensity to see its potential
 intervention_scenarios = {
     "No Intervention": [],
     "Increase in Nutritious Food": [
-        'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)', 
+        'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)',
         'avg_riboflavin(mg)', 'avg_niacin(mg)', 'millet(mt)', 'sorghum(mt)'
     ],
     "Promote Fortified Foods": [
-        'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)', 
+        'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)',
         'avg_riboflavin(mg)', 'avg_niacin(mg)'
     ],
     "Improve Climate Resilience": [
-        'pcfci', 'sorghum(mt)', 'millet(mt)','avg_vitb12(mcg)', 'avg_vita(mcg)', 
+        'pcfci', 'sorghum(mt)', 'millet(mt)','avg_vitb12(mcg)', 'avg_vita(mcg)',
         'avg_riboflavin(mg)', 'avg_niacin(mg)'
     ]
 }
@@ -208,54 +218,50 @@ if st.button("Simulate Intervention"):
         try:
             simulated_df_full = st.session_state['initial_input_df_full'].copy()
             scenario_features = intervention_scenarios[selected_scenario]
-            
+
             # Calculate the dynamic multiplier based on the slider value
             percentage_decimal = intervention_percentage / 100.0
-            
+
             # Apply the multiplier to the relevant features
             for feature in scenario_features:
                 if feature in simulated_df_full.columns:
                     # 'pcfci' is a price index, so a positive intervention means a decrease in value
                     if feature == 'pcfci':
-                        multiplier = 1 + percentage_decimal
-                        simulated_df_full[feature] *= multiplier
+                        multiplier = 1 - percentage_decimal # Corrected multiplier for pcfci
                     # All other features are nutrients or crop yields, so a positive intervention means an increase
                     else:
                         multiplier = 1 + percentage_decimal
-                        simulated_df_full[feature] *= multiplier
+                    simulated_df_full[feature] *= multiplier
                 else:
                     st.write(f"Warning: Scenario impacts feature '{feature}' not found in the simulation dataframe.")
-            
-            st.subheader(f"Simulated Data after {selected_scenario} Intervention at {intervention_percentage}% Impact")
-            st.dataframe(simulated_df_full[selected_features_names])
 
             predicted_level_label = get_prediction_result(simulated_df_full, num_pipeline, model, nutrient_gap_labels)
+
+            st.subheader(f"Simulation Result for {selected_scenario} at {intervention_percentage}% Impact")
+
+            simulated_prediction_data = {'Nutrient Gap Level': [predicted_level_label], 'Value': [1]}
+            simulated_prediction_df = pd.DataFrame(simulated_prediction_data)
             
-            initial_category = st.session_state['initial_input_df_full']['category'].iloc[0]
-            selected_region_name = category_region_map.get(initial_category, 'Unknown Region')
-
-            if predicted_level_label:
-                st.subheader(f"Predicted Nutrient Gap Level in {selected_region_name} after {selected_scenario}: {predicted_level_label}")
-
-                simulated_prediction_data = {'Nutrient Gap Level': [predicted_level_label], 'Value': [1]}
-                simulated_prediction_df = pd.DataFrame(simulated_prediction_data)
-
+            # Use the second column for the simulated graph
+            with col2:
                 plt.figure(figsize=(6, 4))
                 sns.barplot(data=simulated_prediction_df, x='Nutrient Gap Level', y='Value', palette='viridis')
-                plt.title(f"Predicted Nutrient Gap Level after {selected_scenario}")
+                plt.title("Simulated Prediction")
                 plt.ylabel("")
                 plt.yticks([])
                 st.pyplot(plt)
                 plt.clf()
 
-                if predicted_level_label == 'Small Nutrient Gap':
-                    st.success(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is small.")
-                elif predicted_level_label == 'Significant Nutrient Gap':
-                    st.warning(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is significant. This area may require targeted interventions.")
-                else:
-                    st.error(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is severe. Urgent intervention may be needed in this area.")
+
+            if predicted_level_label == 'Small Nutrient Gap':
+                st.success(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is small.")
+            elif predicted_level_label == 'Significant Nutrient Gap':
+                st.warning(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is significant. This area may require targeted interventions.")
+            else:
+                st.error(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is severe. Urgent intervention may be needed in this area.")
 
         except Exception as e:
             st.error(f"Error during simulation: {e}")
     else:
         st.warning("Please get the initial prediction first before simulating interventions.")
+
