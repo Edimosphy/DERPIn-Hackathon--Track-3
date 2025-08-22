@@ -258,11 +258,11 @@ if st.button("Simulate Intervention"):
 
 
             if predicted_level_label == 'Small Nutrient Gap':
-                st.success(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is small.")
+                st.success(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the nutrient gap has improved. Nutrient adequate")
             elif predicted_level_label == 'Significant Nutrient Gap':
-                st.warning(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is significant. This area may require targeted interventions.")
+                st.warning(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the nutrient gap has slightly improved. Continue with the intervention to have nutrient adequate in the region")
             else:
-                st.error(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the predicted nutrient gap is severe. Urgent intervention may be needed in this area.")
+                st.error(f"Based on the '{selected_scenario}' intervention with a {intervention_percentage}% impact, the nutrient gap still need urgent attention. Continue with the intervention to improve the nutrient deficiency")
 
         except Exception as e:
             st.error(f"Error during simulation: {e}")
