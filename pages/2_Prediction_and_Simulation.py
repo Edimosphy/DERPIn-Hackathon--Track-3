@@ -105,27 +105,31 @@ input_cols_for_ui = [col for col in selected_features_names if col != 'category'
 
 for feature in input_cols_for_ui:
     display_label = feature.replace('_', ' ').title()
-    if feature in X_for_pipeline_fit.columns:
-        min_val = float(X_for_pipeline_fit[feature].min())
-        max_val = float(X_for_pipeline_fit[feature].max())
+    if feature in ['sorghum(mt)', 'millet(mt)']:
+        min_val = 1.0
+        max_val = 100000.00
         mean_val = float(X_for_pipeline_fit[feature].mean())
-
-        # Check if the feature is binary (e.g., PCFCI or VCCI)
-        if X_for_pipeline_fit[feature].nunique() <= 2:
-            initial_input_data[feature] = st.number_input(
-                f"Enter a value for {display_label}",
-                min_value=min_val,
-                max_value=max_val,
-                value=mean_val,
-                step=1.0
-            )
-        else:
-            initial_input_data[feature] = st.slider(
-                f"Select a value for {display_label}",
-                min_value=min_val,
-                max_value=max_val,
-                value=mean_val
-            )
+        default_val = max(min(mean_val, max_val), min_val)
+        initial_input_data[feature] = st.slider(
+            f"Select a value for {display_label}",
+            min_value=min_val,
+            max_value=max_val,
+            value=default_val,
+            step=1.0
+        )
+    elif feature in X_for_pipeline_fit.columns:
+        min_val = 0.0
+        max_val = 100.0
+        mean_val = float(X_for_pipeline_fit[feature].mean())
+        default_val = max(min(mean_val, max_val), min_val)
+        step_val = 1.0 if X_for_pipeline_fit[feature].nunique() <= 2 else 0.01
+        initial_input_data[feature] = st.slider(
+            f"Select a value for {display_label}",
+            min_value=min_val,
+            max_value=max_val,
+            value=default_val,
+            step=step_val
+        )
     else:
         initial_input_data[feature] = 0.0
 
@@ -264,3 +268,4 @@ if st.button("Simulate Intervention"):
             st.error(f"Error during simulation: {e}")
     else:
         st.warning("Please get the initial prediction first before simulating interventions.")
+
