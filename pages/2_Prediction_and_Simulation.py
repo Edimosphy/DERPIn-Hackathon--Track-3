@@ -232,10 +232,10 @@ if st.button("Simulate Intervention"):
                 if feature in simulated_df_full.columns:
                     # 'pcfci' is a price index, so a positive intervention means a decrease in value
                     if feature == 'pcfci':
-                        multiplier = 1 + (percentage_decimal * 2) # Corrected multiplier for pcfci
+                        multiplier = 1 + (percentage_decimal * 1) # Corrected multiplier for pcfci
                     # All other features are nutrients or crop yields, so a positive intervention means an increase
                     else:
-                        multiplier = 1 + (percentage_decimal * 2)
+                        multiplier = 1 + (percentage_decimal * 1)
                     simulated_df_full[feature] *= multiplier
                 else:
                     st.write(f"Warning: Scenario impacts feature '{feature}' not found in the simulation dataframe.")
