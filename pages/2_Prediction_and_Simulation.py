@@ -40,6 +40,18 @@ except Exception as e:
     st.error(f"An unexpected error occurred during data/model loading: {e}")
     st.stop()
 
+# --- Preprocessing Pipeline ---
+# Define features and target for pipeline fitting
+X_for_pipeline_fit = nutrient_gap_encoded.drop(columns=['region', 'nutrient_gap_level_encoded', 'category'], errors='ignore')
+
+# Create and fit the preprocessing pipeline once at the start
+num_pipeline = Pipeline([
+    ('variance', VarianceThreshold(threshold=0.01)),
+    ('scaler', StandardScaler())
+])
+# The pipeline must be fitted on data to learn the scaling parameters
+num_pipeline.fit(X_for_pipeline_fit)
+
 # --- Utility Functions ---
 def get_prediction_result(df, pipeline, model, labels):
     """
@@ -47,7 +59,7 @@ def get_prediction_result(df, pipeline, model, labels):
     Returns the predicted label string or None if an error occurs.
     """
     try:
-        # Preprocess the input dataframe using the pipeline
+        # Preprocess the input dataframe using the fitted pipeline
         processed_data = pipeline.transform(df)
         # Make the prediction
         prediction = model.predict(processed_data)
@@ -76,20 +88,11 @@ if st.button("Get Initial Prediction"):
             
             # Drop the 'region' and target columns for prediction
             features = region_data.drop(columns=['region', 'nutrient_gap_level_encoded', 'category'], errors='ignore')
-
-            # Create the preprocessing pipeline (assuming it's not saved)
-            # This is a simplified version, as the real pipeline would need to be loaded
-            # or recreated exactly as it was during training.
-            num_features = features.select_dtypes(include=np.number).columns.tolist()
-            num_pipeline = Pipeline([
-                ('variance', VarianceThreshold(threshold=0.01)),
-                ('scaler', StandardScaler())
-            ])
             
+            # Store the features DataFrame and the fitted pipeline in the session state
             st.session_state['initial_prediction_df'] = features
-            st.session_state['num_pipeline'] = num_pipeline
-
-            # Get the prediction result
+            
+            # Get the prediction result using the pre-fitted pipeline
             predicted_level_label = get_prediction_result(features, num_pipeline, model, nutrient_gap_labels)
             
             if predicted_level_label:
@@ -118,7 +121,8 @@ st.markdown("---")
 st.header("2. Simulate Intervention")
 st.write("Simulate the effect of a positive intervention by increasing commodity-related features.")
 
-if 'initial_prediction_df' in st.session_state and 'num_pipeline' in st.session_state:
+# The `num_pipeline` is now available globally, so we don't need to check session state for it
+if 'initial_prediction_df' in st.session_state:
     st.write("Initial prediction is available. You can now run a simulation.")
     
     # Define a list of scenarios to apply
@@ -138,9 +142,8 @@ if 'initial_prediction_df' in st.session_state and 'num_pipeline' in st.session_
 
     if st.button("Run Simulation"):
         try:
-            # Retrieve the initial prediction dataframe and pipeline from session state
+            # Retrieve the initial prediction dataframe from session state
             initial_df = st.session_state['initial_prediction_df'].copy()
-            num_pipeline = st.session_state['num_pipeline']
             
             # Get the features to be multiplied based on the selected scenario
             features_to_multiply = intervention_options[selected_scenario]
