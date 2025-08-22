@@ -76,12 +76,12 @@ def get_prediction_result(input_df_full, pipeline, model, labels):
 # --- Streamlit UI ---
 st.title("Nutrient Gap Prediction & Intervention Simulation")
 
-st.header("User Input Guide")
-st.write("Input the corresponding numerical codes for your inputs.")
+st.header("Please Enter your Inputs for Result 🔃")
+st.write("↔Input the corresponding numerical codes for your inputs.")
 
 # PCFCI Code
-st.write("pcfci code guide")
-st.write("Check home page for guide")
+st.write("♻ pcfci code guide")
+st.write("◀ Check home page for guide")
 
 # Create a mapping from category code to region name for display
 category_region_map = nutrient_gap_original[['category', 'region']].drop_duplicates().set_index('category')['region'].to_dict()
