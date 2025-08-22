@@ -10,9 +10,15 @@ The main objectives of this project are:
 ## Data Sources
 The analysis leverages data from multiple sources for the year 2022, including:
 - Ghana Food Security and Nutrition Indicators (FAOSTAT, HDX)- Other reliable source
+  - dataset name: ghana_food_price_FAO (final dataset used)
+  - Link: <https://data.humdata.org/dataset/faostat-food-security-indicators-for-ghana> (raw data)
 - AGWAA API Documentation - Ghana (2022)
+  - dataset name: aagwa_data_prod (final dataset used)
+  - Link: <https://www.aagwa.org/Ghana/data?p=Ghana> - Under Publication (raw data)
 - Food System Crisis Observatory and Response (FS-COR) Platform
-  
+  - dataset name: Ghana_nutrient_dataset (final dataset used)
+  - Link: <https://fs-cor.org/Ghana/> (raw data)
+    
 ## Methodology
 The project followed these key steps:
 - Study of the AGWAA and FS-COR dataset to gain more insights for the prediction model building.
@@ -46,9 +52,12 @@ Based on the analysis of the Ghana nutrition data:
 - Monitor and Evaluate: Continuously monitor nutrient gap levels and evaluate the impact of implemented interventions to adapt strategies as needed.
 
 ## Usage 
-Usage of the application is broken down into two main interfaces, accessible via the sidebar on the home page using streamlit web app via https://derpin-nutrient-gap.streamlit.app
+Usage of the application is broken down into two main interfaces, accessible via the sidebar on the home page using streamlit web app via <https://derpin-nutrient-gap.streamlit.app>
 - Data Visualizations: This section presents interactive charts and graphs that allow you to explore key findings, such as regional disparities in nutrient adequacy and the impact of different commodities on nutritional status.
 - Prediction & Simulation: This interface allows you to input specific data points to get a prediction on the nutrient gap level. It also includes a simulation feature where you can model the effects of different interventions and see how they would change the predicted outcome.
+
+##  Result
+
 
 ## Challenges
 - The dataset from AGWAA API Documentation and Food System Crisis Observatory and Response (FS-COR) Platform were hard to collect as the Api of the file was not accessible.
