@@ -71,4 +71,9 @@ Usage of the application is broken down into two main interfaces, accessible via
 ## Challenges
 - The dataset from AGWAA API Documentation and Food System Crisis Observatory and Response (FS-COR) Platform were hard to collect as the Api of the file was not accessible.
 - This was solved by manually collected dataset from AGWAA API publication and sorting of the FS-COR csv.
+
+## Link to Final dataset used
+- Ghana_nutrient_dataset:<https://drive.google.com/file/d/1-fe2BXQHXdscddCzNL3aW27pVfD9MwjP/view?usp=drivesdk>
+- aagwa_data_prod: <https://drive.google.com/file/d/102Crelz3wUxvK9HdMXDLm8ZvqcEXOJ7u/view?usp=drivesdk>
+- ghana_food_price_FA0:
   
