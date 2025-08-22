@@ -115,7 +115,7 @@ for feature in input_cols_for_ui:
             min_value=min_val,
             max_value=max_val,
             value=default_val,
-            step=0.01
+            step=0.0
         )
 
     elif feature in ['pcfci']:
