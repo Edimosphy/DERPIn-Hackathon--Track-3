@@ -142,7 +142,7 @@ st.header("Recommendations")
 st.write("""
     Based on the analysis, the following recommendations can be considered to address nutrient gaps in Ghana:
 
-    - **Investigate the impact of climate change:** Conduct further research into how climate change specifically affects agricultural production in vulnerable regions like Northern Ghana. Implement climate-resilient agricultural practices.
+    - **Investigate the impact of climate change:** Conduct further research into how climate change specifically affects agricultural production in vulnerable regions like Northern part of Ghana. Implement climate-resilient agricultural practices.
     - **Regulate commodity prices:** Implement policies to regulate the prices of highly nutritious commodities to make them more affordable and accessible to vulnerable populations.
     - **Promote diversified agriculture:** Encourage the production of a wider variety of nutritious foods beyond staple crops, including protein-rich sources like poultry and fish, and nutrient-dense crops like sorghum and millet.
     - **Promote nutritional education:** Implement educational programs in schools and communities to raise awareness about the importance of balanced diets and proper nutrition for healthy living and productivity.
