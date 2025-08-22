@@ -15,7 +15,12 @@ The analysis leverages data from multiple sources for the year 2022, including:
   
 ## Methodology
 The project followed these key steps:
-- Data Collection and Integration: Gathering and merging data from the specified sources.
+- Study of the AGWAA and FS-COR dataset to gain more insights for the prediction model building.
+  - After due studies, the following indicators was identified as the nutrient adequency indicators to identify the nutrient gap.
+  - For the AGWAA dataset: These dataset was majorly about the the food production and its yield. The dataset was obtained by merging the dataset from the publication for food such as cassava, rice, sorghum, millet.These dataset was obtained from year 2020 because of its consistent.
+  - For the FS-COR, the focus was on Mean Nutrient Adequacy Ratio Index across the region as this was seen to affected the nutrient consumption ratio. Further exploration was done and it was observed that region tends to consume a particular meal even though it contain less nutrition but was affordable. This exploration leds to using other indicator such as Vulnerability to Climate change (to checkmate if it affected AGWAA dataset which has crop production) and Per capita Food consumption index (to check the aamount of food per on price and quality).
+  - With this due observation, the Ghana Food Security and Nutrition Indicators dataset which contain the price of commodity per region was also used to check the impact of price in nutrition adequacy.
+- Data Collection and Integration: Gathering and merging of the dataset from the specified sources into jupyter notebook for proper analysis.
 - Data Preprocessing: Cleaning, handling missing values and outliers, and preparing the data for analysis and modeling. This included one-hot encoding of categorical features and creating a classified target variable for nutrient gap levels.
 - Exploratory Data Analysis (EDA): Analyzing data distributions, relationships between variables, and identifying patterns related to nutrient gaps through visualizations and statistical summaries.
 - Feature Engineering and Selection: Applying techniques to transform and select the most relevant features for the predictive model.
