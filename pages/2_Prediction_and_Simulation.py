@@ -195,11 +195,11 @@ if 'initial_prediction_run' in st.session_state and st.session_state['initial_pr
             plt.clf()
 
         if initial_predicted_level_label == 'Small Nutrient Gap':
-            st.success("The initial prediction indicates a small nutrient gap. Continue monitoring and promoting healthy diets.")
+            st.success("Small nutrient gap - Nutrient Adequate. Continue monitoring and promoting healthy diets.")
         elif initial_predicted_level_label == 'Significant Nutrient Gap':
-            st.warning("The initial prediction indicates a significant nutrient gap. Consider implementing targeted interventions to address this.")
+            st.warning("Significant nutrient gap - Nutrient Deficient, region slightly affected. Consider implementing targeted interventions to address this.")
         else:
-            st.error("The initial prediction indicates a severe nutrient gap. Urgent and comprehensive interventions are highly recommended.")
+            st.error("Severe nutrient gap - Nutrient Deficient, region affected. Urgent and comprehensive interventions are highly recommended.")
 
 # --- Intervention Simulation ---
 st.header("Intervention Simulation")
