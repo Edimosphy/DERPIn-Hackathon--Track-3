@@ -42,11 +42,19 @@ The model training and evaluation was done using the following models:
 - Decision Tree Classifier
 - Random Forest Classifier.
 
-These models had a 100% accuracy score and F1-score.
+These models had a 100% accuracy score and 100% F1-score showing its ability to recall and precision.
 
-The models were checked to confirm there was no data leakage.
+The models were checked to confirm there was no data leakage, overfitting.
 - This high performance might be as the results of the highly correlation features with the target variables.
-- The random forest model was saved because of its characteristics and to capture more non-linear relationship with future dataset
+- The random forest model was saved because of its characteristics  and to capture more non-linear relationship with future real dataset.
+
+## Feature Importance of Model
+The feature importance of prediction model was checked using the random forest classifier
+![IMG_20250822_152422_189](https://github.com/user-attachments/assets/777aa660-e67a-418c-9ae3-bd5f6575cfcc)
+
+The features importance were used as the basis for user input on the prediction model.
+
+
 
 ## Key Insights
 Based on the analysis of the Ghana nutrition data:
