@@ -196,11 +196,11 @@ intervention_scenarios = {
     "No Intervention": [],
     "Increase in Nutritious Food": [
         'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)',
-        'avg_riboflavin(mg)', 'avg_niacin(mg)', 'millet(mt)', 'sorghum(mt)'
+        'avg_riboflavin(mg)', 'avg_niacin(mg)', 'millet(mt)', 'sorghum(mt)', 'pcfci'
     ],
     "Promote Fortified Foods": [
         'avg_ca(mg)', 'avg_thiamin(mg)', 'avg_vitb12(mcg)', 'avg_vita(mcg)',
-        'avg_riboflavin(mg)', 'avg_niacin(mg)'
+        'avg_riboflavin(mg)', 'avg_niacin(mg)','pcfci'
     ],
     "Improve Climate Resilience": [
         'pcfci', 'sorghum(mt)', 'millet(mt)','avg_vitb12(mcg)', 'avg_vita(mcg)',
@@ -232,10 +232,10 @@ if st.button("Simulate Intervention"):
                 if feature in simulated_df_full.columns:
                     # 'pcfci' is a price index, so a positive intervention means a decrease in value
                     if feature == 'pcfci':
-                        multiplier = 1 + (percentage_decimal * 10) # Corrected multiplier for pcfci
+                        multiplier = 1 + (percentage_decimal * 2) # Corrected multiplier for pcfci
                     # All other features are nutrients or crop yields, so a positive intervention means an increase
                     else:
-                        multiplier = 1 + (percentage_decimal * 10)
+                        multiplier = 1 + (percentage_decimal * 2)
                     simulated_df_full[feature] *= multiplier
                 else:
                     st.write(f"Warning: Scenario impacts feature '{feature}' not found in the simulation dataframe.")
