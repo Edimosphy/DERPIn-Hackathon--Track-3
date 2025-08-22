@@ -57,8 +57,17 @@ Usage of the application is broken down into two main interfaces, accessible via
 - Prediction & Simulation: This interface allows you to input specific data points to get a prediction on the nutrient gap level. It also includes a simulation feature where you can model the effects of different interventions and see how they would change the predicted outcome.
 
 ##  Result
+### Home page of the app
+<img width="800" height="1280" alt="Screenshot_20250822-024200" src="https://github.com/user-attachments/assets/ca33dfa6-ef5f-44b7-bc43-10596e217f69" />
+
+### Result After Prediction
+<img width="800" height="1280" alt="Screenshot_20250822-024523" src="https://github.com/user-attachments/assets/afeb343c-9771-42d3-9288-cb23324ebc84" />
+
+### Result After Applying Intervention
+<img width="800" height="1280" alt="Screenshot_20250822-024644" src="https://github.com/user-attachments/assets/37d149d2-40e8-4ec6-90e0-018d771959b7" />
 
 
 ## Challenges
 - The dataset from AGWAA API Documentation and Food System Crisis Observatory and Response (FS-COR) Platform were hard to collect as the Api of the file was not accessible.
 - This was solved by manually collected dataset from AGWAA API publication and sorting of the FS-COR csv.
+  
