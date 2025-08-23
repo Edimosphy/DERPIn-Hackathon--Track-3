@@ -80,13 +80,18 @@ Usage of the application is broken down into two main interfaces, accessible via
 
 ##  Result
 ### Home page of the app
-<img width="800" height="1280" alt="Screenshot_20250822-024200" src="https://github.com/user-attachments/assets/ca33dfa6-ef5f-44b7-bc43-10596e217f69" />
+<img width="800" height="1280" alt="Screenshot_20250823-145654" src="https://github.com/user-attachments/assets/6f00608c-8f71-4be8-b405-4ae9b142fbce" />
+<img width="800" height="1280" alt="Screenshot_20250823-145718" src="https://github.com/user-attachments/assets/a09dc94d-a587-4d5c-ae4b-1ae07ab0b7b6" />
+
+
 
 ### Result After Prediction
-<img width="800" height="1280" alt="Screenshot_20250822-024523" src="https://github.com/user-attachments/assets/afeb343c-9771-42d3-9288-cb23324ebc84" />
+<img width="800" height="1280" alt="Screenshot_20250823-145741" src="https://github.com/user-attachments/assets/a3e2d3cf-af61-43c4-b080-908957a9f3a5" />
+
 
 ### Result After Applying Intervention
-<img width="800" height="1280" alt="Screenshot_20250822-024644" src="https://github.com/user-attachments/assets/37d149d2-40e8-4ec6-90e0-018d771959b7" />
+<img width="800" height="1280" alt="Screenshot_20250823-145817" src="https://github.com/user-attachments/assets/e33021b4-ca7c-4132-b872-3736a45d5388" />
+<img width="800" height="1280" alt="Screenshot_20250823-145828" src="https://github.com/user-attachments/assets/7da81460-e29e-42d7-a9a5-449b0e62fcef" />
 
 
 ## Challenges
