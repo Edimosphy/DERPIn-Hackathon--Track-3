@@ -58,14 +58,14 @@ The features importance were used as the basis for user input on the prediction 
 
 ## Key Insights
 Based on the analysis of the Ghana nutrition data:
-- Regional Disparities: There are significant regional differences in nutrient adequacy across Ghana, with Eastern and Central regions showing higher nutrient gaps compared to Upper West and Upper East.
+- Regional Disparities: There are significant regional differences in nutrient adequacy across Ghana, with Eastern and Central regions showing lower nutrient gaps compared to Upper West and Upper East which have severe nutrient gap.
 - Dietary Patterns and Price: Consumption patterns are heavily skewed towards staple, carbohydrate-rich foods. More nutritious, protein-rich, and micronutrient-dense foods tend to be more expensive, making them less accessible to vulnerable populations and contributing to nutrient deficiencies.
-- Climate Change Impact: Regions highly vulnerable to climate change, such as Northern Ghana, appear to experience conditions that negatively impact agricultural production and potentially exacerbate nutrient gaps.
+- Climate Change Impact: Regions highly vulnerable to climate change, such as Northern part of Ghana, appear to experience conditions that negatively impact agricultural production and potentially exacerbate nutrient gaps.
 - Micronutrient Deficiencies: Specific micronutrients like Vitamin B12, Calcium, and Niacin are identified as significant factors influencing nutrient gap levels, highlighting potential deficiencies in the diets of vulnerable populations.
 - Model Effectiveness: The developed predictive model effectively identifies areas and populations vulnerable to nutrient gaps based on the available features.
 
 ## Recommendations:
-- Targeted Interventions: Focus nutrition policies and interventions on regions identified with significant and severe nutrient gaps, such as Eastern and Central.
+- Targeted Interventions: Focus nutrition policies and interventions on regions identified with significant and severe nutrient gaps, such as Upper East and Upper West.
 - Price Regulation and Accessibility of Nutrient Dense foods.
 - Promote Diversified and Climate-Resilient Agriculture
 - Enhance Nutritional Education
