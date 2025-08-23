@@ -96,6 +96,6 @@ Usage of the application is broken down into two main interfaces, accessible via
 ## Link to Final dataset used
 - Ghana_nutrient_dataset:<https://drive.google.com/file/d/1-fe2BXQHXdscddCzNL3aW27pVfD9MwjP/view?usp=drivesdk>
 - aagwa_data_prod: <https://drive.google.com/file/d/102Crelz3wUxvK9HdMXDLm8ZvqcEXOJ7u/view?usp=drivesdk>
-- ghana_food_price_FA0: [Uploading wfp_food_prices_gha (1).csv…]()
+- ghana_food_price_FA0: the column used from the link was admin 1 and commodity for this dataset.
 
   
