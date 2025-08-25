@@ -22,10 +22,10 @@ st.write("""
 | Term |                Meaning of Term             | Vulnerability Level | Vunerability Level Code | Nutrient gap Indicator |
 |:----:|:-------------------------------------------|:--------------------|:------------------------|:-----------------------|
 | mnari|    Mean Nutrient Adequate Ratio Index      |     Vulnerable      |         1               |      Severe            |
-|      |                                            |   Invulnerale       |         0               |    Not Severe          |
-| pcfci|   Per Capita Food Consumption Index        |   Invulnerable      |         1               |    Not Severe          |
-|      |                                            |     Vulnerale       |         0               |      Severe            |
+|      |                                            |    Invulnerable     |         0               |    Not Severe          |
+| pcfci|   Per Capita Food Consumption Index        |    Invulnerable     |         1               |    Not Severe          |
+|      |                                            |     Vulnerable      |         0               |      Severe            |
 | vcci |   Vulnerability to Climate Change Index    |     Vulnerable      |         1               |      Severe            |
-|      |                                            |   Invulnerale       |         0               |    Not Severe          |
+|      |                                            |    Invulnerable     |         0               |    Not Severe          |
  
 """)
