@@ -29,7 +29,7 @@ except Exception as e:
 commodity_mnari_mean = nutrient_gap_original.groupby('commodity')['mnari'].mean().reset_index()
 
 # Sort to get the top 5 (lowest MNARI, most significant gap) and less 5 (highest MNARI, least significant gap)
-# A lower MNARI means a more severe gap, so we sort in ascending order.
+# A higher MNARI means a more severe gap, so we sort in ascending order.
 top_5_commodities = commodity_mnari_mean.sort_values(by='mnari', ascending=True).head(5)
 less_5_commodities = commodity_mnari_mean.sort_values(by='mnari', ascending=False).head(5)
 
